@@ -1,0 +1,10 @@
+[
+  { "id": "extra-sa", "name": "eXtra", "adapter": "extra", "country": "SA", "url": "https://www.extra.com/en-sa/",
+    "unbxdKey": "21705619e273429e5767eea44ccb1ad5", "unbxdSite": "ss-unbxd-auk-extra-saudi-en-prod11541714990488",
+    "cityCodes": { "Riyadh": "SA-riyadh", "Jeddah": "SA-jeddah", "Mecca": "SA-makkah", "Medina": "SA-madinah", "Dammam": "SA-dammam", "Khobar": "SA-alkhobar" } },
+  { "id": "extra-bh", "name": "eXtra", "adapter": "extra", "country": "BH", "url": "https://www.extra.com/en-bh/",
+    "unbxdKey": "72883ca2a4420a7c7ca07cefda404539", "unbxdSite": "ss-unbxd-auk-extra-bahrain-en-prod11541714990628" },
+  { "id": "extra-om", "name": "eXtra", "adapter": "extra", "country": "OM", "url": "https://www.extra.com/en-om/",
+    "unbxdKey": "01964c78eef601834b169349d8ba778f", "unbxdSite": "ss-unbxd-auk-extra-oman-en-prod11541714990855",
+    "cityCodes": { "Muscat": "OM-muscat", "Sohar": "OM-sohar", "Nizwa": "OM-nizwa" } }
+]

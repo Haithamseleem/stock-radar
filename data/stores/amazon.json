@@ -1,0 +1,5 @@
+[
+  { "id": "amazon-ae", "name": "Amazon", "adapter": "amazon", "country": "AE", "host": "amazon.ae", "url": "https://www.amazon.ae/" },
+  { "id": "amazon-sa", "name": "Amazon", "adapter": "amazon", "country": "SA", "host": "amazon.sa", "url": "https://www.amazon.sa/" },
+  { "id": "amazon-eg", "name": "Amazon", "adapter": "amazon", "country": "EG", "host": "amazon.eg", "url": "https://www.amazon.eg/" }
+]

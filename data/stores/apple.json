@@ -1,0 +1,6 @@
+[
+  { "id": "apple-ae", "name": "Apple Store", "adapter": "apple", "country": "AE", "locale": "ae", "url": "https://www.apple.com/ae/shop/buy-iphone",
+    "pickup": true, "cities": ["Dubai", "Abu Dhabi", "Al Ain"] },
+  { "id": "apple-sa", "name": "Apple Store", "adapter": "apple", "country": "SA", "locale": "sa", "url": "https://www.apple.com/sa/shop/buy-iphone",
+    "pickup": false }
+]

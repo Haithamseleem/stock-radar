@@ -1,0 +1,11 @@
+[
+  { "id": "sharafdg-ae", "name": "Sharaf DG", "adapter": "sharafdg", "country": "AE", "url": "https://uae.sharafdg.com/", "index": "products_index",
+    "cities": ["Dubai", "Abu Dhabi", "Sharjah", "Ajman", "Al Ain"],
+    "branchCities": { "12": "Abu Dhabi", "13": "Al Ain", "14": "Dubai", "16": "Sharjah", "18": "Ajman" } },
+  { "id": "sharafdg-om", "name": "Sharaf DG", "adapter": "sharafdg", "country": "OM", "url": "https://oman.sharafdg.com/", "index": "oman_products",
+    "cities": ["Muscat", "Sohar"],
+    "branchCities": { "31": "Muscat", "32": "Sohar" } },
+  { "id": "sharafdg-bh", "name": "Sharaf DG", "adapter": "sharafdg", "country": "BH", "url": "https://bahrain.sharafdg.com/", "index": "bahrain_products",
+    "cities": ["Manama", "Riffa", "Seef"],
+    "branchCities": { "2101": "Manama", "2102": "Riffa", "2103": "Seef", "2109": "Manama" } }
+]

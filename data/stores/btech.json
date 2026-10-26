@@ -1,0 +1,4 @@
+[
+  { "id": "btech-eg", "name": "B.TECH", "adapter": "btech", "country": "EG", "url": "https://btech.com/en/", "disabled": true,
+    "reason": "Search page is client-rendered; its product API (retail-online-prod.btech.com/api/v1/green/discovery/api/v1/products/search, POST) times out from the UAE (likely Egypt-only), so it can't be tested from here" }
+]

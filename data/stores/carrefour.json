@@ -1,0 +1,8 @@
+[
+  { "id": "carrefour-ae", "name": "Carrefour", "adapter": "carrefour", "country": "AE", "site": "www.carrefouruae.com", "code": "mafuae", "url": "https://www.carrefouruae.com/mafuae/en/" },
+  { "id": "carrefour-sa", "name": "Carrefour", "adapter": "carrefour", "country": "SA", "site": "www.carrefourksa.com", "code": "mafsau", "url": "https://www.carrefourksa.com/mafsau/en/" },
+  { "id": "carrefour-eg", "name": "Carrefour", "adapter": "carrefour", "country": "EG", "site": "www.carrefouregypt.com", "code": "mafegy", "url": "https://www.carrefouregypt.com/mafegy/en/" },
+  { "id": "carrefour-qa", "name": "Carrefour", "adapter": "carrefour", "country": "QA", "site": "www.carrefourqatar.com", "code": "mafqat", "url": "https://www.carrefourqatar.com/mafqat/en/" },
+  { "id": "carrefour-lb", "name": "Carrefour", "adapter": "carrefour", "country": "LB", "site": "www.carrefourlebanon.com", "code": "maflbn", "lbpPerUsd": 89500, "url": "https://www.carrefourlebanon.com/maflbn/en/" },
+  { "id": "carrefour-iq", "name": "Carrefour", "adapter": "carrefour", "country": "IQ", "site": "www.carrefour.iq", "code": "mafirq", "url": "https://www.carrefour.iq/mafirq/en/", "disabled": true, "reason": "carrefour.iq is not live: Akamai answers 'DNS failure' for the origin" }
+]

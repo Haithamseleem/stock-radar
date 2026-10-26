@@ -1,0 +1,93 @@
+{
+  "title": "Stock Radar",
+  "intervalMinutes": 30,
+  "rotateHours": 2,
+  "runBudget": 80,
+  "parallelWorkers": 32,
+  "perStoreParallel": 3,
+  "storeDelayMs": 400,
+  "runTimeoutSeconds": 180,
+  "alertAfterFailedChecks": 6,
+  "maxAlertsPerChannel": 10,
+  "globalChannel": "",
+  "requestUrl": "",
+  "sections": [
+    { "name": "Phones", "every": 4, "icon": "📱", "blurb": "iPhone, Galaxy, Pixel, Xiaomi, Huawei and foldables" },
+    { "name": "Tablets", "every": 6, "icon": "💻", "blurb": "iPad, Galaxy Tab, Kindle and more" },
+    { "name": "Laptops", "every": 8, "icon": "🖥️", "blurb": "MacBook, ultrabooks and gaming laptops", "types": [
+        { "name": "MacBook", "words": ["macbook"] },
+        { "name": "Gaming laptops", "words": ["rog", "tuf", "legion", "loq", "omen", "victus", "alienware", "predator", "helios", "nitro", "katana", "cyborg", "gf63", "vector", "raider", "rtx", "strix", "zephyrus"] },
+        { "name": "2-in-1 & Surface", "words": ["surface", "x360", "flip", "2 in 1", "yoga 9", "360", "duo"] },
+        { "name": "Everyday & business", "words": ["xps", "dell", "omnibook", "pavilion", "ideapad", "yoga", "thinkpad", "vivobook", "zenbook", "swift", "aspire", "prestige", "galaxy book", "matebook", "spectre"] },
+        { "name": "All models by brand", "words": ["all models"] } ] },
+    { "name": "Gaming", "every": 4, "icon": "🎮", "blurb": "PlayStation, Switch, Xbox, handhelds, VR and controllers", "types": [
+        { "name": "Consoles", "words": ["playstation 5", "ps5", "switch 2", "switch oled", "switch lite", "xbox series"] },
+        { "name": "Handhelds", "words": ["portal", "ally", "steam deck", "legion go", "claw"] },
+        { "name": "VR headsets", "words": ["vr2", "quest"] },
+        { "name": "Controllers", "words": ["controller", "dualsense", "joy con"] },
+        { "name": "Games", "words": ["gta", "grand theft", "fc 26", "black ops", "mario kart world"] },
+        { "name": "Headsets & chairs", "words": ["pulse", "gaming chair"] } ] },
+    { "name": "Audio", "every": 6, "icon": "🎧", "blurb": "Earbuds, headphones, speakers and soundbars", "types": [
+        { "name": "Headphones", "words": ["headphone", "wh 1000", "wh ch", "airpods max", "studio pro", "solo 4", "major", "ult wear", "momentum 4", "tour one", "live 770", "sonos ace"] },
+        { "name": "Earbuds", "words": ["airpods", "buds", "earbuds", "wf 1000", "freebuds", "liberty", "nothing ear", "tour pro", "momentum true wireless", "powerbeats", "fit pro", "motif"] },
+        { "name": "Speakers", "words": ["charge", "flip", "clip", "go 4", "xtreme", "boombox", "partybox", "era", "move", "roam", "emberton", "stanmore", "acton", "soundlink", "pill", "ult field"] },
+        { "name": "Soundbars", "words": ["soundbar", "sound bar", "arc ultra", "beam", "theatre"] } ] },
+    { "name": "Wearables", "every": 6, "icon": "⌚", "blurb": "Smartwatches, fitness bands, rings and smart glasses", "types": [
+        { "name": "Smartwatches", "words": ["watch", "fenix", "forerunner", "venu", "instinct", "vivoactive", "t rex", "amazfit balance", "amazfit active"] },
+        { "name": "Fitness bands & rings", "words": ["band", "fit3", "ring"] },
+        { "name": "Smart glasses & XR", "words": ["glasses", "vision pro"] } ] },
+    { "name": "TVs", "every": 8, "icon": "📺", "blurb": "OLED, Mini-LED and QLED TVs, projectors and streamers", "types": [
+        { "name": "OLED TVs", "words": ["oled", "s95f", "s90f", "s85f", "bravia 8"] },
+        { "name": "Mini-LED & QLED TVs", "words": ["mini led", "qled", "qned", "qn90f", "qn85f", "bravia 9", "bravia 7", "frame"] },
+        { "name": "LED & smart TVs", "words": ["crystal uhd", "bravia", "xiaomi"] },
+        { "name": "Projectors", "words": ["projector", "freestyle", "xgimi"] },
+        { "name": "Streaming devices", "words": ["apple tv", "fire tv", "tv streamer"] } ] },
+    { "name": "Cameras & drones", "every": 8, "icon": "📷", "blurb": "Drones, action cams, mirrorless cameras and mics", "types": [
+        { "name": "Drones", "words": ["mini 5 pro", "mini 4 pro", "mini 4k", "air 3s", "mavic", "neo", "flip", "avata"] },
+        { "name": "Action & 360 cameras", "words": ["gopro", "osmo action", "osmo 360", "osmo nano", "insta360 x", "ace pro", "go ultra", "max 2"] },
+        { "name": "Vlogging & compact", "words": ["osmo pocket", "zv 1", "zv e10", "g7 x", "powershot", "x100"] },
+        { "name": "Mirrorless cameras", "words": ["eos", "alpha", "a7", "fx30", "fujifilm x", "nikon"] },
+        { "name": "Gimbals & mics", "words": ["mic", "osmo mobile", "rs 4", "flow 2"] },
+        { "name": "Instant cameras", "words": ["instax"] } ] },
+    { "name": "Monitors", "every": 12, "icon": "🖵", "blurb": "Gaming, OLED and office monitors" },
+    { "name": "Desktops & PC parts", "every": 12, "icon": "🧩", "blurb": "Mac mini, iMac, graphics cards, CPUs and SSDs", "types": [
+        { "name": "Desktop computers", "words": ["mac mini", "mac studio", "imac", "gaming desktop", "gaming pc"] },
+        { "name": "Graphics cards", "words": ["rtx", "rx 9"] },
+        { "name": "Processors", "words": ["ryzen", "core ultra"] },
+        { "name": "SSDs & storage", "words": ["ssd"] } ] },
+    { "name": "Accessories", "every": 12, "icon": "⌨️", "blurb": "Mice, keyboards, headsets, chargers and power banks", "types": [
+        { "name": "Mice", "words": ["mouse", "mx master", "superlight", "g502", "deathadder"] },
+        { "name": "Keyboards", "words": ["keyboard", "mx keys", "g915", "huntsman"] },
+        { "name": "Headsets", "words": ["headset", "blackshark", "arctis", "cloud iii"] },
+        { "name": "Webcams", "words": ["brio", "webcam"] },
+        { "name": "Chargers & power banks", "words": ["charger", "power bank", "magsafe", "nexode"] },
+        { "name": "Tablet accessories", "words": ["pencil"] },
+        { "name": "Trackers", "words": ["airtag", "smarttag"] },
+        { "name": "Printers", "words": ["printer", "ecotank", "pixma"] } ] },
+    { "name": "Smart home", "every": 16, "icon": "🏠", "blurb": "Wi-Fi mesh, smart speakers, cameras and lights", "types": [
+        { "name": "Wi-Fi & routers", "words": ["deco", "zenwifi", "router", "rapture", "mesh"] },
+        { "name": "Smart speakers & displays", "words": ["echo", "homepod", "nest hub"] },
+        { "name": "Cameras & doorbells", "words": ["doorbell", "camera"] },
+        { "name": "Lights & locks", "words": ["hue", "lock"] } ] },
+    { "name": "Big appliances", "every": 16, "icon": "🧊", "blurb": "Washing machines, fridges, dishwashers, cookers and AC", "types": [
+        { "name": "Washing machines", "words": ["washing machine"] },
+        { "name": "Dryers & washer dryers", "words": ["dryer"] },
+        { "name": "Refrigerators & freezers", "words": ["refrigerator", "fridge", "freezer", "wine", "minibar"] },
+        { "name": "Dishwashers", "words": ["dishwasher"] },
+        { "name": "Air conditioners", "words": ["split", "air conditioner", "dehumidifier"] },
+        { "name": "Cookers & ovens", "words": ["cooker", "oven", "hob", "hood"] },
+        { "name": "Water heaters & dispensers", "words": ["water"] } ] },
+    { "name": "Small appliances", "every": 12, "icon": "☕", "blurb": "Vacuums, coffee machines, air fryers and kitchen", "types": [
+        { "name": "Vacuums", "words": ["vacuum", "v15", "v12", "v11", "v8", "gen5", "washg1", "pencilvac", "vis nav", "x50 ultra", "roomba", "tineco", "bespoke jet", "roborock", "dreame", "deebot", "ecovacs"] },
+        { "name": "Coffee machines", "words": ["nespresso", "vertuo", "essenza", "magnifica", "dinamica", "lattego", "espresso", "coffee", "barista", "bambino", "rivelia", "eletta", "dedica", "creatista", "lattissima"] },
+        { "name": "Air fryers, microwaves & cookers", "words": ["air fryer", "airfryer", "crispi", "foodi", "instant pot", "rice cooker", "microwave"] },
+        { "name": "Blenders & kitchen", "words": ["blender", "mixer", "juicer", "kettle", "toaster", "food processor", "creami", "slushi"] },
+        { "name": "Air purifiers & fans", "words": ["purifier", "humidifier", "fan"] },
+        { "name": "Irons & steamers", "words": ["iron", "steamer", "steam generator"] } ] },
+    { "name": "Personal care", "every": 16, "icon": "💇", "blurb": "Hair stylers, shavers, trimmers, IPL and toothbrushes", "types": [
+        { "name": "Hair stylers & dryers", "words": ["airwrap", "supersonic", "airstrait", "flexstyle", "ghd", "hair"] },
+        { "name": "Shavers & trimmers", "words": ["shaver", "oneblade", "trimmer", "multigroom", "series 9", "series 7"] },
+        { "name": "IPL hair removal", "words": ["ipl", "lumea"] },
+        { "name": "Toothbrushes", "words": ["toothbrush", "oral b", "sonicare"] } ] }
+  ]
+}

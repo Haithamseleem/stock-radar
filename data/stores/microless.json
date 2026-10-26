@@ -1,0 +1,8 @@
+[
+  { "id": "microless-ae", "name": "Microless", "adapter": "microless", "country": "AE", "host": "uae.microless.com",    "url": "https://uae.microless.com/" },
+  { "id": "microless-sa", "name": "Microless", "adapter": "microless", "country": "SA", "host": "saudi.microless.com",  "url": "https://saudi.microless.com/" },
+  { "id": "microless-kw", "name": "Microless", "adapter": "microless", "country": "KW", "host": "kuwait.microless.com", "url": "https://kuwait.microless.com/" },
+  { "id": "microless-qa", "name": "Microless", "adapter": "microless", "country": "QA", "host": "qatar.microless.com",  "url": "https://qatar.microless.com/" },
+  { "id": "microless-bh", "name": "Microless", "adapter": "microless", "country": "BH", "host": "bahrain.microless.com", "url": "https://bahrain.microless.com/" },
+  { "id": "microless-om", "name": "Microless", "adapter": "microless", "country": "OM", "host": "oman.microless.com",   "url": "https://oman.microless.com/" }
+]

@@ -1,0 +1,68 @@
+{
+  "programs": [
+    {
+      "id": "fazaa",
+      "name": "Fazaa",
+      "country": "AE",
+      "who": "Ministry of Interior staff, employees of government/semi-government bodies with a Fazaa agreement, People of Determination, frontline workers and UAE nationals in the private sector.",
+      "url": "https://www.fazaa.ae"
+    },
+    {
+      "id": "esaad",
+      "name": "Esaad (Dubai Police)",
+      "country": "AE",
+      "who": "Dubai Police staff, Dubai government entities, and semi-government/private companies that have signed an agreement with Esaad.",
+      "url": "https://www.esaad.ae"
+    }
+  ],
+  "offers": [
+    {
+      "program": "fazaa",
+      "store": "sharafdg",
+      "storeName": "Sharaf DG",
+      "country": "AE",
+      "discount": "Discount on selected electronics and accessories (specific brands); percentage not stated on the Fazaa page",
+      "where": "in store",
+      "how": "Present a valid Fazaa ID; E-ID details are recorded, physical-ID holders submit a copy.",
+      "conditions": "Channel not stated on page (ID check implies in store). Excludes Apple hard goods/accessories, PS5, Xbox. Not combinable; one discount per invoice (highest of DG Member/Esaad/Fazaa/Waffer/Extra Miles/bank). A separate undated Samsung home-appliances promo page mentions 10% for Fazaa/Esaad in store, limited time.",
+      "source": "https://uae.sharafdg.com/fazaa/",
+      "checked": "2026-10-24"
+    },
+    {
+      "program": "esaad",
+      "store": "sharafdg",
+      "storeName": "Sharaf DG",
+      "country": "AE",
+      "discount": "1% off telecom, 2% off IT, TVs and home appliances, 5% off accessories, 5% off warranty",
+      "where": "in store",
+      "how": "Present a valid Esaad ID; E-ID details are recorded.",
+      "conditions": "Channel not stated on page (ID check implies in store). Specific brands only; excludes Apple hard goods/accessories, PS5, Xbox. Not combinable; one discount per invoice (highest eligible). Sharaf DG may withdraw at any time. A separate undated Samsung home-appliances promo page mentions 10% for Fazaa/Esaad in store, limited time.",
+      "source": "https://uae.sharafdg.com/esaad/",
+      "checked": "2026-10-24"
+    },
+    {
+      "program": "fazaa",
+      "store": "jumbo",
+      "storeName": "Jumbo Electronics",
+      "country": "AE",
+      "discount": "1% off mobiles (code Fazaa1), 5% off accessories (code Fazaa2), 2% off other categories (code Fazaa4)",
+      "where": "online",
+      "how": "Enter the code at checkout; show a valid physical or digital Fazaa card at delivery or Click & Collect (card is photographed with the order number).",
+      "conditions": "Apple, PlayStation and DJI not eligible. Order may be cancelled if card not shown. Seasonal Music Fest extra (25 Sep to 20 Oct 2026) has ended.",
+      "source": "https://www.jumbo.ae/terms-and-conditions",
+      "checked": "2026-10-24"
+    },
+    {
+      "program": "esaad",
+      "store": "jumbo",
+      "storeName": "Jumbo Electronics",
+      "country": "AE",
+      "discount": "1% off mobiles (code Esaad1), 5% off accessories (code Esaad2), 2% off other categories (code Esaad4)",
+      "where": "online",
+      "how": "Enter the code at checkout; show a valid physical or digital Esaad card at delivery or Click & Collect (card is photographed with the order number).",
+      "conditions": "Apple, PlayStation and DJI not eligible. Order may be cancelled if card not shown. Seasonal Music Fest extra (25 Sep to 20 Oct 2026) has ended.",
+      "source": "https://www.jumbo.ae/terms-and-conditions",
+      "checked": "2026-10-24"
+    }
+  ]
+}

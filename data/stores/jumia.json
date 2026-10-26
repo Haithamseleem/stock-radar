@@ -1,0 +1,6 @@
+[
+  { "id": "jumia-eg", "name": "Jumia", "adapter": "jumia", "country": "EG", "url": "https://www.jumia.com.eg/", "disabled": true,
+    "reason": "Cloudflare challenge (HTTP 403, 'Just a moment') on every search page; needs a real browser" },
+  { "id": "jumia-ma", "name": "Jumia", "adapter": "jumia", "country": "MA", "url": "https://www.jumia.ma/", "disabled": true,
+    "reason": "Cloudflare challenge (HTTP 403, 'Just a moment') on every search page; needs a real browser" }
+]

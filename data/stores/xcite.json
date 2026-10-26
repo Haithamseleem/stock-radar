@@ -1,0 +1,6 @@
+[
+  { "id": "xcite-kw", "name": "Xcite", "adapter": "xcite", "country": "KW", "url": "https://www.xcite.com/",
+    "index": "xcite_prod_kw_en_relevancy" },
+  { "id": "xcite-sa", "name": "Xcite", "adapter": "xcite", "country": "SA", "url": "https://www.xcite.com.sa/",
+    "disabled": true, "reason": "xcite.com.sa is behind Incapsula bot protection (403 from the UAE, needs a real browser); xcite.com only serves Kuwait" }
+]

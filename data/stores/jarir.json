@@ -1,0 +1,15 @@
+[
+  { "id": "jarir-sa", "name": "Jarir Bookstore", "adapter": "jarir", "country": "SA", "url": "https://www.jarir.com/sa-en/",
+    "site": "sa-en", "key": "key_KcSYfmQTEwRpBnd9",
+    "showrooms": { "Riyadh": ["0114","0112","0103","0107","0108","0111","0104","0105","0110","0101","0115","0117","0118","0116","0119","0121","0122","0127","0128","0129"],
+                   "Jeddah": ["0304","0305","0301","0312","0321","0323","0325","0326","0327"], "Mecca": ["0308","0303","0322"],
+                   "Medina": ["0307","0314","0331"], "Dammam": ["0203","0206","0209"], "Khobar": ["0202","0201","0211"] } },
+  { "id": "jarir-kw", "name": "Jarir Bookstore", "adapter": "jarir", "country": "KW", "url": "https://www.jarir.com/kw-en/",
+    "site": "kw-en", "key": "key_U68DuNFAX8dObLkO", "showrooms": { "Hawalli": ["1401"], "Salmiya": ["1404"] } },
+  { "id": "jarir-qa", "name": "Jarir Bookstore", "adapter": "jarir", "country": "QA", "url": "https://www.jarir.com/qa-en/",
+    "site": "qa-en", "key": "key_MCRDK6GzJiCfIlTB", "showrooms": { "Doha": ["1101","1103","1104"], "Al Rayyan": ["1102"] } },
+  { "id": "jarir-ae", "name": "Jarir Bookstore", "adapter": "jarir", "country": "AE", "url": "https://www.jarir.com/ae-en/",
+    "site": "ae-en", "key": "key_Cilj2C7cnF5fXHDf", "showrooms": { "Sharjah": ["1204"] } },
+  { "id": "jarir-bh", "name": "Jarir Bookstore", "adapter": "jarir", "country": "BH", "url": "https://www.jarir.com/bh-en/",
+    "site": "bh-en", "key": "key_22oyrgw8GfSirgqq", "showrooms": { "Seef": ["1501"] } }
+]

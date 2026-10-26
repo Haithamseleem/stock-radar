@@ -1,0 +1,4 @@
+[
+  { "id": "mytek-tn", "name": "Mytek", "adapter": "mytek", "country": "TN", "url": "https://www.mytek.tn/", "disabled": true,
+    "reason": "Cloudflare challenge (HTTP 403, 'Just a moment') on every search page; needs a real browser" }
+]

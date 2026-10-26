@@ -1,0 +1,7 @@
+[
+  { "id": "virgin-ae", "name": "Virgin Megastore", "adapter": "virgin", "country": "AE", "base": "https://www.virginmegastore.ae", "usdRate": 3.67, "url": "https://www.virginmegastore.ae/en" },
+  { "id": "virgin-bh", "name": "Virgin Megastore", "adapter": "virgin", "country": "BH", "base": "https://www.virginmegastore.bh", "usdRate": 0.376, "url": "https://www.virginmegastore.bh/en" },
+  { "id": "virgin-qa", "name": "Virgin Megastore", "adapter": "virgin", "country": "QA", "base": "https://www.virginmegastore.qa", "usdRate": 3.64, "url": "https://www.virginmegastore.qa/en" },
+  { "id": "virgin-om", "name": "Virgin Megastore", "adapter": "virgin", "country": "OM", "base": "https://www.virginmegastore.om", "usdRate": 0.385, "url": "https://www.virginmegastore.om/en",
+    "disabled": true, "reason": "Akamai 'Access Denied' for scripted requests (and the TLS revocation check fails from here)" }
+]

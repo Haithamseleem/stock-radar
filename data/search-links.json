@@ -1,0 +1,19 @@
+{
+  "_about": "Search page per platform, so the page can link 'Search store' when a product isn't listed. {q} = the product's search words; {field} = that field from the store's entry. A store's own \"search\" field wins.",
+  "amazon": "https://www.{host}/s?k={q}",
+  "noon": "https://www.noon.com/{locale}/search/?q={q}",
+  "microless": "https://{host}/search/?query={q}",
+  "carrefour": "https://{site}/{code}/en/search?keyword={q}",
+  "lulu": "https://www.luluhypermarket.com/{locale}/list/?search_text={q}",
+  "virgin": "{base}/en/search?text={q}",
+  "sharafdg": "{url}?q={q}&post_type=product",
+  "jumbo": "{base}/catalogsearch/result/?q={q}",
+  "emax": "{base}/search?q={q}",
+  "extra": "{url}search/?text={q}",
+  "jarir": "{url}catalogsearch/result?search={q}",
+  "xcite": "https://www.xcite.com/search?q={q}",
+  "2b": "https://2b.com.eg/en/catalogsearch/result/?q={q}",
+  "tunisianet": "https://www.tunisianet.com.tn/recherche?controller=search&s={q}",
+  "miswag": "https://miswag.com/search?q={q}",
+  "smartbuy": "https://smartbuy-me.com/search?q={q}"
+}

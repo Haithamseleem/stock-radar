@@ -1,0 +1,4 @@
+[
+  { "id": "electroplanet-ma", "name": "Electroplanet", "adapter": "electroplanet", "country": "MA", "url": "https://www.electroplanet.ma/", "disabled": true,
+    "reason": "Cloudflare challenge (HTTP 403, 'Just a moment') on every search page; needs a real browser" }
+]

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stock Radar banner</title>
+<!-- Share banners, exported to PNG by brand\render-brand.ps1. Pick one with the link's #size-style:
+     #og-gradient #og-light (1200x630 link preview) · #square-… (1080x1080 post) · #story-… (1080x1920) · #avatar (640) · #icon (180) -->
+<style>
+html, body { margin:0; padding:0; background:transparent; }
+body { font-family:"Madefor Text", Inter, "Segoe UI", system-ui, Arial, sans-serif; -webkit-font-smoothing:antialiased; }
+.b { position:relative; overflow:hidden; box-sizing:border-box; display:flex; }
+.og { width:1200px; height:630px; padding:60px 72px; gap:44px; align-items:center; }
+.square { width:1080px; height:1080px; padding:72px 84px; flex-direction:column; gap:22px; }
+.story { width:1080px; height:1920px; padding:190px 96px 170px; flex-direction:column; gap:48px; }
+.avatar { width:640px; height:640px; } .icon { width:180px; height:180px; }
+.gradient { color:#fff; background:radial-gradient(900px 520px at 88% 0%, rgba(255,255,255,.20), transparent 62%), linear-gradient(135deg, #0f62e6, #7c3aed); }
+.light { color:#162d3d; background:radial-gradient(900px 600px at 90% 0%, rgba(15,98,230,.10), transparent 60%), #f0f4f7; }
+.text { display:flex; flex-direction:column; gap:18px; flex:1; min-width:0; }
+.logo { display:flex; align-items:center; gap:16px; font-weight:800; letter-spacing:-.5px; }
+.logo img { border-radius:22%; box-shadow:0 6px 20px rgba(22,45,61,.25); }
+.light .logo span b { background:linear-gradient(90deg,#0f62e6,#7c3aed); -webkit-background-clip:text; color:transparent; }
+h1 { margin:0; font-weight:800; line-height:1.04; letter-spacing:-1.5px; }
+p { margin:0; line-height:1.35; opacity:.92; }
+.light p { color:#3d4a57; opacity:1; }
+.chips { display:flex; flex-wrap:wrap; gap:10px; }
+.chip { border-radius:999px; padding:8px 16px; font-weight:600; display:inline-flex; align-items:center; gap:8px; }
+.gradient .chip { background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); }
+.light .chip { background:#fff; border:1px solid #dfe5eb; }
+.dot { width:12px; height:12px; border-radius:50%; background:#22c55e; display:inline-block; }
+.cta { align-self:flex-start; border-radius:999px; font-weight:700; padding:16px 30px; }
+.gradient .cta { background:#fff; color:#0f62e6; } .light .cta { background:#0f62e6; color:#fff; }
+.card { background:#fff; color:#162d3d; border-radius:20px; padding:26px; box-shadow:0 18px 50px rgba(22,45,61,.28); display:flex; flex-direction:column; gap:16px; }
+.card .t { font-weight:800; } .card .m { color:#5f6b78; }
+.best { background:#e6f7ec; color:#157a3e; border-radius:12px; padding:12px 16px; font-weight:700; }
+.cols { display:flex; gap:12px; }
+.col { flex:1; border:1px solid #dfe5eb; border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:6px; position:relative; }
+.col.top { border-color:#22c55e; box-shadow:0 0 0 2px #22c55e; }
+.col .r { position:absolute; top:-12px; left:12px; background:#22c55e; color:#fff; font-size:13px; font-weight:800; padding:3px 10px; border-radius:999px; }
+.col .s { color:#5f6b78; font-weight:600; } .col .p { font-weight:800; white-space:nowrap; } .col .d { color:#5f6b78; }
+.pill { align-self:flex-start; background:#e6f7ec; color:#157a3e; border-radius:999px; padding:3px 10px; font-weight:700; font-size:13px; }
+/* sizes for text and card */
+.og .logo { font-size:32px; } .og .logo img { width:54px; height:54px; } .og h1 { font-size:54px; } .og p { font-size:21px; } .og .chip { font-size:16px; padding:6px 13px; } .og .cta { font-size:20px; padding:14px 26px; }
+.og .card { width:440px; flex:none; } .og .card .t { font-size:23px; } .og .card .m { font-size:16px; } .og .best { font-size:17px; } .og .col .p { font-size:18px; } .og .col .s, .og .col .d { font-size:14px; }
+.square .logo { font-size:40px; } .square .logo img { width:68px; height:68px; } .square h1 { font-size:72px; } .square p { font-size:26px; } .square .chip { font-size:19px; } .square .cta { font-size:24px; padding:16px 32px; }
+.square .card { padding:22px; } .square .card .t { font-size:26px; } .square .card .m { font-size:18px; } .square .best { font-size:20px; } .square .col .p { font-size:22px; } .square .col .s, .square .col .d { font-size:17px; }
+.story .logo { font-size:52px; } .story .logo img { width:92px; height:92px; } .story h1 { font-size:118px; } .story p { font-size:40px; } .story .chip { font-size:28px; } .story .cta { font-size:34px; padding:24px 44px; }
+.story .card .t { font-size:36px; } .story .card .m { font-size:25px; } .story .best { font-size:28px; } .story .col .p { font-size:32px; } .story .col .s, .story .col .d { font-size:20px; } .story .spacer { flex:1; }
+.avatar img, .icon img { width:100%; height:100%; display:block; }
+</style>
+</head>
+<body>
+<div id="b" class="b"></div>
+<script>
+// Static banner built from the link's #size-style; no timers, so headless screenshots finish.
+const [size, style] = (location.hash.slice(1) || 'og-gradient').split('-');
+const b = document.getElementById('b');
+b.className = 'b ' + size + ' ' + (style || 'gradient');
+const mark = '<img src="../mark.svg" alt="">';
+if (size === 'avatar' || size === 'icon') {
+  b.innerHTML = '<img src="../mark.svg" alt="Stock Radar">';
+  b.style.background = 'linear-gradient(135deg,#0f62e6,#7c3aed)';
+} else {
+  const logo = `<div class="logo">${mark}<span>Stock <b>Radar</b></span></div>`;
+  const text = `<h1>Find it in stock.<br>Pay the best price.</h1>
+    <p>Phones, laptops, gaming, TVs and home appliances, checked around the clock across the Middle East.</p>
+    <div class="chips"><span class="chip"><span class="dot"></span>46 stores</span><span class="chip">10 countries</span><span class="chip">250+ products</span><span class="chip">Every 5 min</span></div>`;
+  const card = `<div class="card">
+      <div><div class="t">iPhone 17 Pro Max 256GB</div><div class="m">Example comparison · United Arab Emirates</div></div>
+      <div class="best">Best price AED 4,349 · in stock at 7 stores</div>
+      <div class="cols">
+        <div class="col top"><span class="r">Best</span><span class="s">Store A</span><span class="pill">In stock</span><span class="p">AED 4,349</span></div>
+        <div class="col"><span class="s">Store B</span><span class="pill">In stock</span><span class="p">AED 4,362</span><span class="d">+AED 13</span></div>
+        <div class="col"><span class="s">Store C</span><span class="pill">In stock</span><span class="p">AED 4,470</span><span class="d">+3%</span></div>
+      </div></div>`;
+  const cta = '<span class="cta">Compare prices free →</span>';
+  if (size === 'og') b.innerHTML = `<div class="text">${logo}${text}${cta}</div>${card}`;
+  else if (size === 'square') b.innerHTML = `${logo}<div class="text">${text}</div>${card}${cta}`;
+  else b.innerHTML = `${logo}<div class="text">${text}</div><div class="spacer"></div>${card}${cta}`;
+}
+</script>
+</body>
+</html>

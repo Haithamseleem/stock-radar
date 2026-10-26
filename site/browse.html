@@ -1,0 +1,1172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stock Radar · Compare prices and stock across the Middle East</title>
+<meta name="description" content="Which stores have it in stock right now, who sells it cheapest, store coupons and discount cards, across the Middle East.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Stock Radar">
+<meta name="theme-color" content="#162d3d">
+<!-- Link previews (WhatsApp, Telegram, X...); publish.ps1 fills in https://haithamseleem.github.io/stock-radar/ with the page's address. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Stock Radar">
+<meta property="og:title" content="Stock Radar: compare prices and stock across the Middle East">
+<meta property="og:description" content="Which stores have it in stock right now and who sells it cheapest: phones, laptops, gaming, TVs and appliances.">
+<meta property="og:image" content="https://haithamseleem.github.io/stock-radar/brand/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root {
+  /* Text colours meet WCAG AA (4.5:1) on their backgrounds; see BRAND.md. */
+  --bg:#f0f4f7; --card:#fff; --text:#162d3d; --muted:#5f6b78; --line:#dfe5eb; --soft:#f7f9fb;
+  --primary:#0f62e6; --primary-hover:#0b53c4; --primary-soft:#e7f0ff;
+  --side:#162d3d; --side-text:#fff; --side-muted:#a8b4c0; --side-hover:rgba(255,255,255,.07); --side-on:rgba(255,255,255,.14);
+  --ok:#157a3e; --ok-bg:#e6f7ec; --warn:#8f5600; --warn-bg:#fff4e0; --no:#c4362e; --no-bg:#fdecea; --tag:#5b3bd6; --tag-bg:#f1edff; --gray:#eef1f4;
+  --field:#8593a1; --line-hover:#b9cff5; --radius:8px; --shadow:0 1px 2px rgba(22,45,61,.06), 0 4px 14px rgba(22,45,61,.05);
+}
+* { box-sizing:border-box; }
+html, body { margin:0; }
+body { font:15px/1.45 "Madefor Text", Inter, "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif; background:var(--bg); color:var(--text); }
+a { color:var(--primary); text-decoration:none; } a:hover { text-decoration:underline; }
+[hidden] { display:none !important; }
+button { font:inherit; }
+
+/* Layout: dark side menu + main area */
+.app { display:grid; grid-template-columns:260px 1fr; min-height:100vh; }
+.side { background:var(--side); color:var(--side-text); padding:max(18px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); position:sticky; top:0; height:100vh; overflow-y:auto; display:flex; flex-direction:column; gap:14px; }
+.brand { display:flex; align-items:center; gap:10px; font-weight:800; font-size:19px; color:#fff; padding:2px 6px; }
+.brand:hover { text-decoration:none; }
+.brand-mark { width:30px; height:30px; border-radius:8px; flex:none; }
+.side-select { width:100%; appearance:none; background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;
+  color:#fff; border:1px solid rgba(255,255,255,.45); border-radius:999px; padding:8px 34px 8px 16px; font:inherit; font-size:14px; cursor:pointer; }
+.side-select option { color:#162d3d; }
+.pulse { background:rgba(255,255,255,.06); border-radius:var(--radius); padding:12px 14px; }
+.pulse b { display:block; font-size:14px; } .pulse span { display:block; font-size:12px; color:var(--side-muted); margin-top:6px; }
+.pbar { height:4px; border-radius:4px; background:rgba(255,255,255,.18); margin-top:10px; overflow:hidden; } .pbar i { display:block; height:100%; width:0; background:#3b8bff; border-radius:4px; }
+.nav { display:flex; flex-direction:column; gap:2px; }
+.nav button { display:flex; align-items:center; gap:12px; width:100%; background:none; border:0; color:var(--side-text); text-align:left; padding:9px 10px; border-radius:6px; cursor:pointer; font-size:15px; }
+.nav button:hover { background:var(--side-hover); } .nav button.on { background:var(--side-on); }
+.nav .ic { width:22px; text-align:center; } .nav .count { margin-left:auto; font-size:12px; background:rgba(255,255,255,.16); border-radius:999px; padding:1px 8px; color:#fff; }
+.nav hr { border:0; border-top:1px solid rgba(255,255,255,.12); margin:8px 4px; }
+/* Tree: a section opens to its brands */
+.nav button.sec::after { content:'\25B8'; margin-left:8px; color:var(--side-muted); font-size:11px; } .nav button.sec.open::after { content:'\25BE'; }
+.nav .lbl { flex:1; min-width:0; }
+.nav button.sub { padding:7px 10px 7px 44px; font-size:14px; color:#d5dde4; } .nav button.sub .ic { display:none; } .nav button.sub.on { color:#fff; }
+.nav button.sub.typed::after { content:'\25B8'; margin-left:8px; color:var(--side-muted); font-size:10px; } .nav button.sub.typed.open::after { content:'\25BE'; }
+.nav button.sub2 { padding:6px 10px 6px 60px; font-size:13px; color:#c3ccd5; } .nav button.sub2 .ic { display:none; } .nav button.sub2.on { color:#fff; }
+.brand-h { background:none; border:0; padding:0; font:inherit; color:inherit; cursor:pointer; } .brand-h:hover { color:var(--primary); }
+.side-foot { margin-top:auto; font-size:12px; color:var(--side-muted); padding:0 6px; }
+.side-foot a { color:#fff; text-decoration:underline; display:inline-block; padding:6px 0; }
+.main { min-width:0; }
+.topbar { display:flex; align-items:center; gap:12px; padding:max(14px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) 14px max(24px, env(safe-area-inset-left)); position:sticky; top:0; z-index:10; background:rgba(240,244,247,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line); }
+.menu { display:none; background:var(--card); border:1px solid var(--line); border-radius:8px; padding:6px 10px; cursor:pointer; }
+.crumbs { display:flex; align-items:center; gap:8px; font-size:15px; min-width:0; flex-wrap:wrap; }
+.crumbs a, .crumbs button { color:var(--muted); background:none; border:0; padding:0; cursor:pointer; }
+.crumbs .sep { color:#a8b4c0; } .crumbs b { font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.actions { margin-left:auto; display:flex; align-items:center; gap:8px; }
+.search { position:relative; } .search input { width:260px; }
+.content { padding:20px max(24px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left)); max-width:1280px; }
+
+/* Controls in the dashboard style */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; border-radius:999px; padding:8px 18px; min-height:38px; font-size:14px; font-weight:600; border:1px solid transparent; cursor:pointer; white-space:nowrap; text-decoration:none !important; }
+.btn.primary { background:var(--primary); color:#fff; } .btn.primary:hover { background:var(--primary-hover); }
+.btn.ghost { background:var(--primary-soft); color:var(--primary); } .btn.ghost:hover { background:#d9e7ff; color:var(--primary-hover); }
+.btn.line { background:var(--card); border-color:var(--line); color:var(--text); }
+.btn.small { padding:5px 14px; font-size:13px; } .btn.block { width:100%; }
+input[type=search], select.field, input.field { font:inherit; font-size:14px; color:var(--text); background:var(--card); border:1px solid var(--field); border-radius:6px; padding:8px 12px; height:38px; width:100%; }
+input[type=search]:focus, select.field:focus, input.field:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-soft); }
+.field-label { display:flex; flex-direction:column; gap:6px; font-size:14px; color:var(--text); }
+.info { display:inline-flex; width:15px; height:15px; border-radius:50%; border:1px solid currentColor; font-size:11px; align-items:center; justify-content:center; color:var(--muted); cursor:help; font-style:normal; margin-left:4px; vertical-align:1px; background:none; padding:0; font-family:inherit; line-height:1; }
+.switch { display:inline-flex; align-items:center; gap:10px; cursor:pointer; font-size:14px; user-select:none; }
+.switch { position:relative; } .switch input { position:absolute; opacity:0; width:1px; height:1px; margin:0; } .switch input:focus-visible + i { outline:2px solid var(--primary); outline-offset:2px; } .switch i { width:34px; height:18px; border-radius:999px; background:var(--field); position:relative; transition:.15s; flex:none; }
+.switch i::after { content:''; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:#fff; transition:.15s; box-shadow:0 1px 2px rgba(0,0,0,.2); }
+.switch input:checked + i { background:var(--primary); } .switch input:checked + i::after { left:18px; }
+.chips { display:flex; flex-wrap:wrap; gap:6px; }
+.chip { display:inline-flex; align-items:center; gap:6px; font-size:13px; padding:4px 12px; border-radius:999px; background:var(--gray); color:var(--text); border:1px solid transparent; }
+.chip .dot, .dot { width:8px; height:8px; border-radius:50%; background:#b7c1cb; display:inline-block; flex:none; }
+.dot.ok { background:#25a55a; } .dot.warn { background:#ffa700; } .dot.tag { background:#8a6cff; }
+button.chip { cursor:pointer; background:var(--card); border-color:var(--line); }
+button.chip:hover { border-color:#9fbaf0; } button.chip.on { background:var(--primary-soft); border-color:var(--primary); color:var(--primary); font-weight:600; }
+
+/* Cards */
+.card { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); }
+.card-pad { padding:18px 20px; }
+.toolbar { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:14px 16px; align-items:end; padding:16px 20px; }
+.toolbar .toggles { display:flex; flex-wrap:wrap; gap:10px 18px; grid-column:span 2; padding-bottom:9px; }
+.range { display:flex; align-items:center; gap:6px; } .range span { color:var(--muted); }
+.seg { display:inline-flex; justify-self:end; border:1px solid var(--field); border-radius:6px; overflow:hidden; background:#fff; height:42px; flex:none; }
+.seg button { display:inline-flex; align-items:center; justify-content:center; gap:8px; background:#fff; border:0; padding:0 16px; cursor:pointer; font-size:15px; color:var(--text); white-space:nowrap; }
+.seg .vi { width:20px; height:20px; flex:none; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.seg button + button { border-left:1px solid var(--field); }
+.seg button[aria-pressed="true"] { box-shadow:inset 0 0 0 2px var(--primary); color:var(--primary); font-weight:600; }
+/* Views: big cards, grid (default), list */
+.grid.big { grid-template-columns:repeat(auto-fill,minmax(440px,1fr)); } .grid.big .photo { width:140px; height:140px; } .grid.big .pname { font-size:19px; }
+.lview { padding:0; overflow:hidden; }
+.lrow { display:grid; grid-template-columns:56px minmax(200px,2.2fr) minmax(170px,1.2fr) 90px auto; gap:14px; align-items:center; padding:12px 16px; border-top:1px solid var(--line); }
+.lrow:first-child { border-top:0; } .lrow .thumb { width:56px; height:56px; cursor:pointer; }
+.lrow .lname .chips { margin-top:6px; } .lrow .lname .chip { font-size:12px; padding:2px 9px; }
+.lrow .lprice b { color:var(--ok); font-size:16px; } .lrow .lstores { font-size:13px; color:var(--muted); text-align:center; }
+.statrow { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 4px; align-items:center; }
+.sec-h { display:flex; align-items:baseline; gap:10px; margin:24px 0 10px; } .sec-h h2 { font-size:20px; margin:0; } .sec-h span { color:var(--muted); font-size:13px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr)); gap:14px; }
+.pcard { padding:16px; display:flex; flex-direction:column; gap:10px; }
+.phead { display:flex; gap:12px; align-items:center; }
+/* Track: products saved in this browser, listed with their stock on the home page */
+.btn.track { background:var(--card); border-color:var(--line); color:var(--text); } .btn.track:hover { border-color:#b9cff5; }
+.btn.track.on { background:var(--warn-bg); border-color:#ffd18a; color:var(--warn); }
+.btn.star { width:34px; height:34px; padding:0; flex:none; font-size:17px; line-height:1; margin-left:auto; align-self:flex-start; }
+.lact { display:flex; gap:8px; align-items:center; } .lact .btn.star { margin-left:0; align-self:center; }
+.hero-act { display:flex; flex-direction:column; gap:8px; }
+.photo { width:68px; height:68px; object-fit:contain; border-radius:8px; background:#fff; border:1px solid var(--line); flex:none; cursor:pointer; }
+.photo.big { width:120px; height:120px; cursor:default; } .photo.ph { display:flex; align-items:center; justify-content:center; font-size:30px; background:var(--soft); }
+.thumb { width:48px; height:48px; object-fit:contain; border-radius:6px; background:#fff; border:1px solid var(--line); flex:none; }
+.thumb.ph { display:flex; align-items:center; justify-content:center; font-size:20px; background:var(--soft); }
+.pname { background:none; border:0; padding:0; color:var(--text); cursor:pointer; text-align:left; font-size:16px; font-weight:700; line-height:1.3; }
+.pname:hover { color:var(--primary); }
+.meta { color:var(--muted); font-size:13px; }
+.bestline { font-size:14px; background:var(--soft); border-radius:6px; padding:8px 10px; } .bestline b { color:var(--ok); }
+.offer { display:grid; grid-template-columns:1fr auto; gap:2px 10px; padding:8px 0; border-top:1px solid var(--line); }
+.offer .side-r { text-align:right; } .offer .sub { grid-column:1 / -1; color:var(--muted); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sname { display:inline-flex; align-items:center; gap:8px; flex-wrap:wrap; } .sname .name { font-weight:600; } .where { color:var(--muted); font-size:13px; }
+.logo { width:24px; height:24px; border-radius:6px; object-fit:contain; background:#fff; border:1px solid var(--line); flex:none; }
+.logo.ph { display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--muted); background:var(--soft); }
+.pill { font-size:12px; padding:2px 10px; border-radius:999px; white-space:nowrap; display:inline-block; }
+.InStock { background:var(--ok-bg); color:var(--ok); } .Unverified { background:var(--warn-bg); color:var(--warn); }
+.price { font-weight:700; } .small { font-size:12px; color:var(--muted); } .diff { font-size:12px; color:var(--muted); }
+.badge { font-size:12px; font-weight:700; padding:1px 7px; border-radius:6px; background:var(--ok-bg); color:var(--ok); margin-left:6px; }
+.save { display:block; font-size:13px; font-weight:700; color:var(--no); margin-top:2px; }
+.save.chip { display:inline-flex; font-size:12px; padding:2px 10px; margin:0 0 0 4px; background:var(--no-bg); border-color:transparent; vertical-align:1px; }
+.coupon { display:inline-block; font-size:12px; font-weight:600; padding:2px 8px; border-radius:6px; background:var(--tag-bg); color:var(--tag); }
+.prog { display:inline-block; font-size:12px; font-weight:700; padding:1px 6px; border-radius:5px; border:1px solid var(--tag); color:var(--tag); }
+.rest { font-size:13px; color:var(--muted); }
+.empty { text-align:center; color:var(--muted); padding:36px 12px; }
+
+/* Comparison: hero + horizontal store columns */
+.hero { display:grid; grid-template-columns:auto 1fr auto; gap:20px; align-items:start; padding:20px; }
+.hero h1 { font-size:26px; margin:0 0 4px; line-height:1.2; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin-top:14px; }
+.kpi { background:var(--soft); border:1px solid var(--line); border-radius:8px; padding:10px 12px; } .kpi b { display:block; font-size:19px; } .kpi span { font-size:12px; color:var(--muted); }
+.block-h { display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:16px 20px 0; } .block-h h2 { font-size:18px; margin:0; } .block-h span { font-size:13px; color:var(--muted); }
+.strip { display:flex; gap:12px; overflow-x:auto; padding:16px 20px 20px; scroll-snap-type:x proximity; scroll-padding-inline:20px; overscroll-behavior-x:contain; -webkit-overflow-scrolling:touch; }
+.strip-wrap { position:relative; }
+.strip-wrap::before, .strip-wrap::after { content:''; position:absolute; top:0; bottom:8px; width:44px; pointer-events:none; opacity:0; transition:opacity .15s; z-index:1; }
+.strip-wrap::before { left:0; background:linear-gradient(90deg,#fff 20%,rgba(255,255,255,0)); }
+.strip-wrap::after { right:0; background:linear-gradient(270deg,#fff 20%,rgba(255,255,255,0)); }
+.strip-wrap.can-left::before, .strip-wrap.can-right::after { opacity:1; }
+.sarrow { position:absolute; top:50%; transform:translateY(-50%); z-index:2; width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:#fff;
+  box-shadow:0 2px 8px rgba(22,45,61,.18); cursor:pointer; font-size:22px; line-height:1; color:var(--text); display:flex; align-items:center; justify-content:center; padding:0 0 3px; }
+.sarrow.l { left:8px; } .sarrow.r { right:8px; } .sarrow:hover { color:var(--primary); border-color:#9fbaf0; }
+.strip::-webkit-scrollbar { height:8px; } .strip::-webkit-scrollbar-thumb { background:var(--field); border-radius:8px; }
+.col { flex:0 0 230px; scroll-snap-align:start; border:1px solid var(--line); border-radius:var(--radius); padding:14px; display:flex; flex-direction:column; gap:8px; position:relative; background:var(--card); }
+.col.best { border-color:#25a55a; box-shadow:0 0 0 1px #25a55a; }
+.col .ribbon { position:absolute; top:-10px; left:12px; background:var(--ok); color:#fff; font-size:12px; font-weight:700; padding:2px 10px; border-radius:999px; }
+.col .bigprice { font-size:22px; font-weight:800; } .col .listing { font-size:12px; color:var(--muted); display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; min-height:3.9em; }
+.col .grow { flex:1; } .col .btn { margin-top:auto; }
+.col.country { flex-basis:200px; }
+.col .alt { display:flex; align-items:center; justify-content:space-between; gap:8px; border-top:1px solid var(--line); padding-top:8px; }
+.col .alt .price { font-weight:800; }
+.models { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr)); gap:10px; padding:16px 20px 20px; }
+.model { display:grid; grid-template-columns:48px 1fr auto; gap:10px; align-items:center; border:1px solid var(--line); border-radius:8px; padding:10px; }
+.model .mt { font-size:13px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.model .ms { font-size:12px; color:var(--muted); display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:4px; } .model .side-r { text-align:right; }
+.model .mlink { background:none; border:0; padding:0; font:inherit; font-weight:600; font-size:14px; line-height:1.3; color:var(--text); text-align:left; cursor:pointer; overflow-wrap:anywhere; }
+.model .mlink:hover { color:var(--primary); text-decoration:underline; }
+.model .mq { display:inline-block; margin-top:6px; background:none; border:0; padding:0; font:inherit; font-size:13px; font-weight:600; color:var(--primary); text-align:left; cursor:pointer; }
+.model .mq:hover { text-decoration:underline; }
+.model .btn.star { margin:6px 0 0; }
+/* The full model lists: bigger photos and text */
+.models .model { grid-template-columns:84px 1fr auto; gap:14px; padding:12px; }
+.models .thumb { width:84px; height:84px; }
+.models .model .mt { font-size:14px; -webkit-line-clamp:3; }
+.models .model .ms { font-size:13px; }
+.models .model .price { font-size:16px; }
+/* Big: the photo on top, large */
+.models.big { grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr)); gap:14px; }
+.models.big .model { grid-template-columns:1fr auto; align-items:start; padding:14px; }
+.models.big .thumb { grid-column:1 / -1; width:100%; height:180px; }
+.models.big .model .mt, .models.big .model .mlink { font-size:15px; }
+.models.big .model .price { font-size:18px; }
+/* List: one per line, compact */
+.models.list { grid-template-columns:1fr; gap:6px; }
+.models.list .model { grid-template-columns:56px 1fr auto; padding:8px 12px; }
+.models.list .thumb { width:56px; height:56px; }
+.models.list .model .mt { -webkit-line-clamp:1; }
+.mtools { display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:12px 20px 0; } .mtools input { flex:1 1 220px; width:auto; }
+.offer-card { padding:12px 0; border-top:1px solid var(--line); } .offer-card b { font-size:15px; }
+.cols { display:grid; grid-template-columns:1fr; gap:14px; margin-top:24px; } @media (min-width:1000px) { .cols { grid-template-columns:1fr 1fr; } }
+.cols h2 { font-size:18px; margin:0 0 8px; }
+.list { list-style:none; padding:0; margin:0; } .list li { padding:7px 0; border-top:1px solid var(--line); font-size:13px; }
+footer { color:var(--muted); font-size:13px; margin-top:28px; }
+
+/* Accessibility (UI/UX Pro Max guidelines): visible keyboard focus, sticky bar doesn't hide focused items,
+   long names wrap, links big enough to tap, motion off when the system asks, loading placeholders. */
+html { scroll-behavior:smooth; scroll-padding-top:76px; }
+:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
+.side :focus-visible { outline-color:#fff; }
+input[type=search]:focus-visible, select.field:focus-visible { outline:none; }
+.pname, .mt, .listing, .offer .sub, .col .sname .name { overflow-wrap:anywhere; }
+a.small { display:inline-block; padding:4px 0; }
+button.chip.na { color:var(--muted); }
+.skel { background:linear-gradient(90deg,#eef1f4 25%,#f7f9fb 50%,#eef1f4 75%); background-size:200% 100%; animation:skel 1.2s infinite linear; border-radius:6px; }
+@keyframes skel { to { background-position:-200% 0; } }
+.skel-card { padding:16px; display:flex; flex-direction:column; gap:10px; } .skel-card .a { height:68px; width:68px; } .skel-card .b { height:14px; } .skel-card .c { height:34px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition:none !important; animation:none !important; scroll-behavior:auto !important; } }
+
+/* Phones and small tablets: the side menu slides in from the ☰ button */
+@media (max-width:900px) {
+  .app { grid-template-columns:1fr; }
+  .side { position:fixed; left:0; top:0; bottom:0; width:270px; z-index:30; transform:translateX(-100%); transition:transform .2s; }
+  .side.open { transform:none; box-shadow:0 0 0 100vmax rgba(0,0,0,.35); visibility:visible; transition:transform .2s; }
+  .side:not(.open) { visibility:hidden; transition:transform .2s, visibility 0s .2s; }
+  html { scroll-padding-top:136px; }
+  .menu { display:inline-flex; min-height:40px; min-width:40px; justify-content:center; }
+  .toolbar { grid-template-columns:1fr 1fr; } .toolbar .toggles, .seg { grid-column:1 / -1; } .seg { justify-self:stretch; } .seg button { flex:1; } .hero { grid-template-columns:1fr; }
+  .grid.big { grid-template-columns:1fr; } .lrow { grid-template-columns:56px 1fr; } .lrow .lprice, .lrow .lstores, .lrow .lact { grid-column:2; text-align:left; } .content { padding:14px; }
+  .topbar { padding:10px 14px; flex-wrap:wrap; } .actions { flex:1 1 100%; order:3; } .search { flex:1; } .search input { width:100%; }
+  #shareBtn { display:none; }
+  /* 16px text on phones: readable, and iPhones don't zoom into the fields */
+  body, input[type=search], select.field, .side-select { font-size:16px; }
+  .btn { min-height:40px; }
+}
+/* Phones: tap targets at least 44px */
+@media (max-width:640px) {
+  .btn, .menu, .seg button, input[type=search], select.field, input.field, .side-select, .nav button, .switch, .sarrow, button.chip { min-height:44px; }
+  .menu, .sarrow { min-width:44px; } .btn.star { width:44px; height:44px; } .seg { height:auto; } .chips { gap:8px; }
+  .crumbs a, .crumbs button, .brand-h, a.small, .side-foot a { display:inline-flex; align-items:center; min-height:44px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side">
+    <a class="brand" href="index.html"><img class="brand-mark" src="brand/mark.svg" alt="" width="30" height="30"><span id="title">Stock Radar</span></a>
+    <select class="side-select" id="country" aria-label="Country"></select>
+    <div class="pulse"><b id="liveTitle">Loading…</b><div class="pbar"><i id="liveBar"></i></div><span id="liveSub"></span></div>
+    <nav class="nav" id="nav" aria-label="Sections"></nav>
+    <div class="side-foot"><a href="index.html">Home</a> · <a href="deals.html">All deals</a><br>Stores are checked automatically. Prices and stock change fast: confirm on the store’s page.</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <button class="menu" id="menuBtn" type="button" aria-label="Menu" aria-controls="side" aria-expanded="false">☰</button>
+      <nav class="crumbs" id="crumbs" aria-label="Breadcrumb"></nav>
+      <div class="actions">
+        <div class="search"><input id="q" type="search" placeholder="Search products, models, stores" aria-label="Search products, models or stores"></div>
+        <button class="btn ghost" id="refreshBtn" type="button" hidden title="Check the stores for this country and section now">⟳ Refresh</button>
+        <button class="btn ghost" id="installBtn" type="button" hidden>Install app</button>
+        <button class="btn ghost" id="shareBtn" type="button">Share</button>
+        <a class="btn primary" id="tg" hidden target="_blank" rel="noopener noreferrer">Telegram alerts</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="card toolbar" id="toolbar">
+        <label class="field-label">City <select class="field" id="city"></select></label>
+        <label class="field-label">Product <select class="field" id="product"></select></label>
+        <label class="field-label">Store <select class="field" id="store"></select></label>
+        <label class="field-label">Sort by
+          <select class="field" id="sort">
+            <option value="rec">Recommended</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option>
+            <option value="saving">Biggest saving between stores</option><option value="stores">Most stores</option><option value="newest">Newest in stock</option><option value="name">Name A–Z</option>
+          </select></label>
+        <div class="field-label"><span>Price (<span id="curLabel">AED</span>)</span>
+          <div class="range"><input class="field" id="pmin" type="number" min="0" inputmode="numeric" placeholder="Min" aria-label="Minimum price"><span aria-hidden="true">–</span><input class="field" id="pmax" type="number" min="0" inputmode="numeric" placeholder="Max" aria-label="Maximum price"></div></div>
+        <div class="toggles">
+          <label class="switch"><input id="instock" type="checkbox"><i></i>In stock only</label>
+          <label class="switch"><input id="confirmed" type="checkbox"><i></i>Confirmed only</label>
+          <label class="switch"><input id="coupon" type="checkbox"><i></i>With coupon</label>
+        </div>
+        <div class="seg" id="viewSeg" role="group" aria-label="View">
+          <button type="button" data-view="big" title="Big cards"><svg class="vi" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>Big</button><button type="button" data-view="grid" title="Grid"><svg class="vi" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>Grid</button><button type="button" data-view="list" title="List"><svg class="vi" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>List</button>
+        </div>
+      </div>
+      <div class="statrow" id="stats" aria-live="polite"></div>
+
+      <div id="results" aria-busy="true"><div class="grid" style="margin-top:24px"><div class="card skel-card"><div class="skel a"></div><div class="skel b"></div><div class="skel b" style="width:60%"></div><div class="skel c"></div></div><div class="card skel-card"><div class="skel a"></div><div class="skel b"></div><div class="skel b" style="width:60%"></div><div class="skel c"></div></div><div class="card skel-card"><div class="skel a"></div><div class="skel b"></div><div class="skel b" style="width:60%"></div><div class="skel c"></div></div></div></div>
+      <section id="compare" hidden></section>
+      <section id="discounts" hidden></section>
+
+      <div class="cols" id="sideCols">
+        <div class="card card-pad"><h2>Recent changes</h2><ul class="list" id="history"></ul></div>
+        <div class="card card-pad"><h2>Stores checked here</h2><ul class="list" id="storeList"></ul></div>
+      </div>
+
+      <footer>
+        <p>Only stores that have it available are compared. <b>Unconfirmed</b> means the store lists it but doesn’t clearly say it’s in stock.
+          Coupons and discount cards come from the stores’ own pages; check their terms before you pay.</p>
+        <p id="request" hidden>Missing a product? <a id="requestLink" target="_blank" rel="noopener noreferrer">Ask for it to be added</a>.</p>
+      </footer>
+    </div>
+  </main>
+</div>
+
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const LABEL = { InStock: 'In stock', Unverified: 'Unconfirmed', OutOfStock: 'Out of stock', NotFound: 'Not listed', Error: "Couldn't check" };
+const AVAIL = (r) => r.st === 'InStock' || r.st === 'Unverified';
+const safeUrl = (u) => { try { const x = new URL(u, location.href); return x.protocol === 'https:' || x.protocol === 'http:' ? x.href : null; } catch { return null; } };
+const ago = (iso) => {
+  const s = Math.max(0, Math.round((Date.now() - new Date(iso)) / 1000));
+  if (s < 90) return 'just now'; const m = Math.round(s / 60); if (m < 90) return m + ' min ago';
+  const h = Math.round(m / 60); if (h < 36) return h + ' h ago'; return Math.round(h / 24) + ' days ago';
+};
+const money = (code, n) => n == null ? '' : `${code} ${Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
+const extLink = (href, text, cls) => Object.assign(el('a', cls, text), { href, target: '_blank', rel: 'noopener noreferrer' });
+const info = (text) => { const b = Object.assign(el('button', 'info', 'i'), { type: 'button', title: text }); b.setAttribute('aria-label', text); return b; };
+let DATA = null, ROWS = { rows: [], history: [] }, stores = {}, products = {}, countries = {}, families = {};
+let compareId = '', sectionName = '', typeName = '', brandName = '', viewMode = 'browse', pushNext = false, refreshing = '';
+const motion = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+const pickedSize = {};   // family -> product id chosen on its card
+
+// ---- data: data.js (everything but results) and data-<country>.js (one country's results) ----
+function loadScript(src, pick) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src + '?t=' + Date.now();
+    s.onload = () => { s.remove(); const v = pick(); v ? resolve(v) : reject(new Error('empty')); };
+    s.onerror = () => { s.remove(); reject(new Error('missing')); };
+    document.head.append(s);
+  });
+}
+const loadCountry = (code) => loadScript(`data-${code}.js`, () => window.RADAR_ROWS && window.RADAR_ROWS[code]).catch(() => ({ rows: [], history: [] }));
+
+// ---- view state lives in the link (#country=AE&section=Phones&compare=...) ----
+function readHash() {
+  const p = new URLSearchParams(location.hash.slice(1));
+  let saved = {}; try { saved = JSON.parse(localStorage.getItem('radarView') || '{}'); } catch { }
+  return { country: p.get('country') || saved.country || 'AE', city: p.get('city') || saved.city || '', product: p.get('product') || '',
+           instock: (p.get('instock') || '') === '1', store: p.get('store') || '', sort: p.get('sort') || '', pmin: p.get('pmin') || '', pmax: p.get('pmax') || '',
+           confirmed: p.get('confirmed') === '1', coupon: p.get('coupon') === '1', compare: p.get('compare') || '', section: p.get('section') || '', type: p.get('type') || '', brand: p.get('brand') || '', view: p.get('view') || '', layout: p.get('layout') || '', q: p.get('q') || '' };
+}
+function view() {
+  return { country: $('country').value, city: $('city').value, product: $('product').value, instock: $('instock').checked, q: $('q').value.trim().toLowerCase(),
+           store: $('store').value, sort: $('sort').value, pmin: $('pmin').value, pmax: $('pmax').value, confirmed: $('confirmed').checked, coupon: $('coupon').checked };
+}
+function writeHash(v) {
+  const p = new URLSearchParams();
+  p.set('country', v.country); if (v.city) p.set('city', v.city); if (v.product) p.set('product', v.product); if (v.instock) p.set('instock', '1');
+  if (v.store) p.set('store', v.store); if (v.sort && v.sort !== 'rec') p.set('sort', v.sort); if (v.pmin) p.set('pmin', v.pmin); if (v.pmax) p.set('pmax', v.pmax);
+  if (v.confirmed) p.set('confirmed', '1'); if (v.coupon) p.set('coupon', '1');
+  if (compareId) p.set('compare', compareId); else if (viewMode === 'discounts') p.set('view', 'discounts'); else if (sectionName) { p.set('section', sectionName); if (typeName) p.set('type', typeName); if (brandName) p.set('brand', brandName); }
+  // Opening a product or section adds a history step, so the Back button returns to the list.
+  if (pushNext && location.hash !== '#' + p.toString()) history.pushState(null, '', '#' + p.toString()); else history.replaceState(null, '', '#' + p.toString());
+  pushNext = false;
+  localStorage.setItem('radarView', JSON.stringify({ country: v.country, city: v.city }));
+}
+function fillFilters(start) {
+  const cs = $('country'); cs.replaceChildren();
+  [...DATA.countries].sort((a, b) => a.name.localeCompare(b.name)).forEach(c => { const o = el('option', null, c.name); o.value = c.code; cs.append(o); });
+  cs.value = countries[start.country] ? start.country : (countries.AE ? 'AE' : DATA.countries[0].code);
+  const ps = $('product'); ps.replaceChildren(Object.assign(el('option', null, 'All products'), { value: '' }));
+  (DATA.sections || []).forEach(sec => {
+    const list = DATA.products.filter(p => p.category === sec.name); if (!list.length) return;
+    const g = el('optgroup'); g.label = sec.name;
+    list.forEach(p => { const o = el('option', null, p.name); o.value = p.id; g.append(o); });
+    ps.append(g);
+  });
+  ps.value = products[start.product] ? start.product : '';
+  $('instock').checked = start.instock;
+  $('sort').value = ['rec', 'price-asc', 'price-desc', 'saving', 'stores', 'newest', 'name'].includes(start.sort) ? start.sort : 'rec';
+  $('pmin').value = start.pmin || ''; $('pmax').value = start.pmax || ''; $('confirmed').checked = !!start.confirmed; $('coupon').checked = !!start.coupon;
+  fillCities(start.city); fillStores(start.store);
+}
+// Store filter: this country's stores; the price fields use its currency.
+function fillStores(want) {
+  const code = $('country').value, s = $('store');
+  s.replaceChildren(Object.assign(el('option', null, 'All stores'), { value: '' }));
+  DATA.stores.filter(x => x.country === code).sort((a, b) => a.name.localeCompare(b.name)).forEach(x => { const o = el('option', null, x.name); o.value = x.id; s.append(o); });
+  s.value = stores[want] && stores[want].country === code ? want : '';
+  $('curLabel').textContent = countries[code] ? countries[code].currency : '';
+}
+function fillCities(want) {
+  const c = countries[$('country').value];
+  const s = $('city'); s.replaceChildren(Object.assign(el('option', null, 'All cities'), { value: '' }));
+  (c ? c.cities : []).forEach(n => { const o = el('option', null, n); o.value = n; s.append(o); });
+  s.value = c && c.cities.includes(want) ? want : '';
+}
+
+// A row counts for a city when it's that city's branch stock, or online stock from a store that delivers there.
+function rowsFor(v, pid) {
+  return ROWS.rows.filter(r => {
+    const s = stores[r.s]; if (!s || !products[r.p]) return false;
+    if (pid && r.p !== pid) return false;
+    if (!pid && v.product && r.p !== v.product) return false;
+    if (v.city) { if (r.c) return r.c === v.city; if (s.cities && s.cities.length && !s.cities.includes(v.city)) return false; }
+    return true;
+  });
+}
+
+// ---- building blocks ----
+const famOf = (p) => p.family || p.id;
+// Tracked products (this browser only): the home page lists them with their stock and best price.
+const watched = () => { try { const v = JSON.parse(localStorage.getItem('radarWatch') || '[]'); return Array.isArray(v) ? v.filter(x => typeof x === 'string') : []; } catch { return []; } };
+function trackBtn(p, star) {
+  const b = el('button', 'btn track' + (star ? ' star' : '')); b.type = 'button';
+  const paint = () => {
+    const on = watched().includes(p.id);
+    b.textContent = star ? (on ? '★' : '☆') : (on ? '★ Tracking' : '☆ Track');
+    b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on));
+    b.title = on ? 'Tracking: shown on the home page. Click to stop.' : 'Track it: see its stock on the home page';
+    if (star) b.setAttribute('aria-label', 'Track ' + p.name);
+  };
+  b.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const ids = watched(), i = ids.indexOf(p.id); if (i >= 0) ids.splice(i, 1); else ids.push(p.id);
+    try { localStorage.setItem('radarWatch', JSON.stringify(ids)); } catch { }
+    paint();
+  });
+  paint(); return b;
+}
+// How often a product is checked here: the UAE every run (hot) or every few runs; other countries in turn.
+const hours = (min) => min >= 90 ? `${Math.round(min / 60)} h` : `${min} min`;
+function checkNote(p, long) {
+  const every = DATA.intervalMinutes || 30;
+  if ($('country').value !== 'AE') return p.hot ? '🔥 popular' : (long ? `checked in turn with other countries, about every ${hours(Math.max(1, DATA.countries.length - 1) * (DATA.rotateHours || 2) * 60)}` : '');
+  if (p.hot) return long ? `🔥 checked every ${hours(every)}` : `🔥 every ${hours(every)}`;
+  return long && p.every ? `checked about every ${hours(p.every * every)}` : '';
+}
+const famName = (p) => p.familyName || p.name;
+const queryFor = (p, s) => (p.queries && p.queries[s.adapter]) || p.query || p.name;
+function linkFor(r, s, p) {
+  if (r && AVAIL(r) && safeUrl(r.u)) return safeUrl(r.u);
+  if (s.search) { const u = safeUrl(s.search.replace('{q}', encodeURIComponent(queryFor(p, s)))); if (u) return u; }
+  return safeUrl(s.url);
+}
+function logoEl(s) {
+  const ph = () => el('span', 'logo ph', (s.name || '?').slice(0, 1).toUpperCase());
+  if (!s.logo) return ph();
+  const i = el('img', 'logo'); i.src = s.logo; i.alt = ''; i.loading = 'lazy'; i.onerror = () => i.replaceWith(ph()); return i;
+}
+function programsFor(s) {
+  const d = DATA.discounts; if (!d || !d.offers) return [];
+  return d.offers.filter(o => o.store === s.adapter && (!o.country || o.country === s.country))
+    .map(o => Object.assign({ programName: ((d.programs || []).find(p => p.id === o.program) || {}).name || o.program }, o));
+}
+function storeName(s, where) {
+  const w = el('span', 'sname'); w.append(logoEl(s), el('span', 'name', s.name));
+  if (where) w.append(el('span', 'where', where));
+  programsFor(s).forEach(o => { const b = el('span', 'prog', o.programName); b.title = `${o.programName}: ${o.discount}`; w.append(b); });
+  return w;
+}
+function photoEl(p, cls, src) {
+  const sec = (DATA.sections || []).find(s => s.name === p.category);
+  const ph = () => el('div', cls + ' ph', sec ? sec.icon : '•');
+  const url = [src, p.photo].find(u => typeof u === 'string' && u); if (!url) return ph();
+  const i = el('img', cls); i.src = url; i.alt = ''; i.loading = 'lazy'; i.referrerPolicy = 'no-referrer'; i.onerror = () => i.replaceWith(ph()); return i;
+}
+// The price you'd pay: after the store's coupon when that's lower.
+const eff = (r) => r.cpr != null && r.cpr < r.pr ? r.cpr : r.pr;
+function bestPrice(list) {
+  const pick = (st) => list.filter(r => r.st === st && r.pr != null).sort((a, b) => eff(a) - eff(b))[0];
+  return pick('InStock') || pick('Unverified') || null;
+}
+// What the best offer saves against the priciest other store (prices after coupons), as "Save AED 350 (5%)", the
+// percent of the higher price. Under 1% isn't worth showing; over half is nearly always a different item.
+function savingOf(best, list) {
+  if (!best || best.pr == null) return null;
+  const hi = list.filter(r => r.pr != null && r.s !== best.s).sort((a, b) => eff(b) - eff(a))[0];
+  if (!hi) return null;
+  const amt = eff(hi) - eff(best), pct = amt / eff(hi);
+  return pct >= 0.01 && pct <= 0.5 ? { amt, pct, hi } : null;
+}
+const saveText = (sv, cur) => `Save ${money(cur, Math.round(sv.amt))} (${Math.round(sv.pct * 100)}%)`;
+function saveEl(sv, cur, cls) { const e = el('span', 'save' + (cls ? ' ' + cls : ''), saveText(sv, cur)); e.title = `Compared with ${stores[sv.hi.s].name} at ${money(cur, eff(sv.hi))}`; return e; }
+function vsBest(r, best, cur) {
+  if (!best || r.pr == null) return '';
+  if (r === best) return 'Best price';
+  const d = eff(r) - eff(best), pct = d / eff(best) * 100;
+  return d <= 0 ? 'Same price' : `+${money(cur, d)} (+${pct < 1 ? pct.toFixed(1) : Math.round(pct)}%)`;
+}
+function couponLine(r, cur) {
+  if (!r.cp) return null;
+  const box = el('div'); box.append(el('span', 'coupon', '🏷 ' + r.cp));
+  if (r.cpr != null && r.cpr < r.pr) box.append(el('div', 'small', `${money(cur, r.cpr)} after coupon`));
+  return box;
+}
+const sub = (r) => [r.t, r.n, r.since ? (r.st === 'InStock' ? 'in stock since ' : 'since ') + ago(r.since) : '', r.stale ? 'last check failed, showing the previous result' : ''].filter(Boolean).join(' · ');
+function openCompare(id) { compareId = id; viewMode = 'browse'; pushNext = true; closeMenu(); render(); window.scrollTo({ top: 0, behavior: motion }); }
+function go(section, mode, brand, type) { compareId = ''; sectionName = section; brandName = section ? (brand || '') : ''; typeName = section ? (type || '') : ''; viewMode = mode || 'browse'; pushNext = true; closeMenu(); render(); window.scrollTo({ top: 0, behavior: motion }); }
+const closeMenu = () => { $('side').classList.remove('open'); $('menuBtn').setAttribute('aria-expanded', 'false'); };
+
+// ---- main render ----
+function render() {
+  const v = view(); writeHash(v);
+  const c = countries[v.country];
+  const comparing = !!(compareId && products[compareId]);
+  const discounting = !comparing && viewMode === 'discounts';
+  let rows = rowsFor(v);
+  const all = rows;
+  if (!comparing && !discounting && sectionName) rows = rows.filter(r => products[r.p].category === sectionName && (!typeName || products[r.p].type === typeName) && (!brandName || products[r.p].brand === brandName));
+  if (!comparing) {
+    if (v.store) rows = rows.filter(r => r.s === v.store);
+    if (v.confirmed) rows = rows.filter(r => r.st !== 'Unverified');
+    if (v.coupon) rows = rows.filter(r => r.cp && AVAIL(r));
+    const lo = parseFloat(v.pmin) || 0, hi = parseFloat(v.pmax) || Infinity;
+    if (v.pmin || v.pmax) rows = rows.filter(r => AVAIL(r) && r.pr != null && eff(r) >= lo && eff(r) <= hi);
+  }
+  if (v.q && !comparing) rows = rows.filter(r => (stores[r.s].name + ' ' + products[r.p].name + ' ' + (r.t || '')).toLowerCase().includes(v.q));
+
+  $('results').hidden = comparing || discounting; $('compare').hidden = !comparing; $('discounts').hidden = !discounting;
+  $('toolbar').hidden = comparing; $('sideCols').hidden = comparing;
+  renderNav(all); renderCrumbs(c);
+
+  const avail = rows.filter(AVAIL), st = $('stats'); st.replaceChildren();
+  if (!comparing) {
+    const chip = (dot, text) => { const s = el('span', 'chip'); s.append(el('span', 'dot ' + dot), document.createTextNode(text)); st.append(s); };
+    const fams = new Set(avail.filter(r => r.st === 'InStock').map(r => famOf(products[r.p])));
+    chip('ok', `${fams.size} product${fams.size === 1 ? '' : 's'} in stock`);
+    const unconf = new Set(avail.filter(r => r.st === 'Unverified').map(r => famOf(products[r.p]))).size; if (unconf) chip('warn', `${unconf} unconfirmed`);
+    const cps = avail.filter(r => r.cp).length; if (cps) chip('tag', `${cps} with a coupon`);
+    chip('', `${DATA.stores.filter(s => s.country === v.country).length} stores checked in ${c ? c.name : ''}`);
+  }
+  const m = /^@(\w+)$/.exec((c && c.telegram) || DATA.globalChannel || '');
+  $('tg').hidden = !m; if (m) $('tg').href = 'https://t.me/' + m[1];
+
+  if (comparing) renderCompare(v, c);
+  else if (discounting) renderDiscounts(v, c);
+  else renderCards(rows, v, c);
+  renderSide(v);
+}
+
+// Brands in a section (or one of its types): most models first, "Any brand" (mixed-brand model lists) last.
+function brandsOf(section, type) {
+  const n = {};
+  DATA.products.filter(p => p.category === section && (!type || p.type === type)).forEach(p => { const b = p.brand || 'Other'; (n[b] = n[b] || new Set()).add(famOf(p)); });
+  return Object.keys(n).sort((a, b) => (a === 'Any brand') - (b === 'Any brand') || n[b].size - n[a].size || a.localeCompare(b));
+}
+// Sections with "types" in settings.json (appliances, audio, accessories...) open to product types first, then brands;
+// the others (phones, laptops...) open straight to brands. Types keep the settings order, "Other" last.
+function typesOf(section) {
+  const def = ((DATA.sections || []).find(s => s.name === section) || {}).types || [];
+  const have = new Set(DATA.products.filter(p => p.category === section && p.type).map(p => p.type));
+  return def.map(t => t.name).concat(['Other']).filter(n => have.has(n));
+}
+
+// Menu tree: sections > types > brands (or sections > brands); counts are models in stock here.
+function renderNav(rows) {
+  const nav = $('nav'); nav.replaceChildren();
+  const inStock = {}, brandStock = {};
+  const tally = (k, p) => (brandStock[k] = brandStock[k] || new Set()).add(famOf(p));
+  rows.filter(r => r.st === 'InStock').forEach(r => {
+    const p = products[r.p];
+    (inStock[p.category] = inStock[p.category] || new Set()).add(famOf(p));
+    tally(p.category + '|' + p.brand, p);
+    if (p.type) { tally(p.category + '|t|' + p.type, p); tally(p.category + '|t|' + p.type + '|' + p.brand, p); }
+  });
+  const count = (k) => brandStock[k] ? brandStock[k].size : null;
+  const item = (icon, label, on, count, fn, cls, expanded) => {
+    const b = el('button', [cls, on ? 'on' : ''].filter(Boolean).join(' ') || null); b.type = 'button';
+    if (on) b.setAttribute('aria-current', 'page');
+    if (expanded != null) b.setAttribute('aria-expanded', String(expanded));
+    b.append(el('span', 'ic', icon), el('span', 'lbl', label)); if (count) b.append(el('span', 'count', String(count)));
+    b.addEventListener('click', fn); nav.append(b);
+  };
+  const browsing = viewMode === 'browse', curP = compareId && products[compareId];
+  const openSec = curP ? curP.category : sectionName, openBrand = curP ? curP.brand : brandName, openType = curP ? (curP.type || '') : typeName;
+  item('▦', 'All products', browsing && !sectionName && !compareId, null, () => go(''));
+  const have = new Set(DATA.products.map(p => p.category));
+  (DATA.sections || []).filter(s => have.has(s.name)).forEach(s => {
+    const open = browsing && openSec === s.name, types = typesOf(s.name);
+    item(s.icon || '•', s.name, open && !openBrand && !openType, inStock[s.name] ? inStock[s.name].size : null, () => go(s.name), 'sec' + (open ? ' open' : ''), open);
+    if (!open) return;
+    if (!types.length) {
+      brandsOf(s.name).forEach(br => item('', br, openBrand === br, count(s.name + '|' + br), () => go(s.name, 'browse', br), 'sub'));
+      return;
+    }
+    types.forEach(t => {
+      const tOpen = openType === t;
+      item('', t, tOpen && !openBrand, count(s.name + '|t|' + t), () => go(s.name, 'browse', '', t), 'sub typed' + (tOpen ? ' open' : ''), tOpen);
+      if (tOpen) brandsOf(s.name, t).forEach(br => item('', br, openBrand === br, count(s.name + '|t|' + t + '|' + br), () => go(s.name, 'browse', br, t), 'sub2'));
+    });
+  });
+  nav.append(el('hr'));
+  item('🏷', 'Discounts & coupons', viewMode === 'discounts' && !compareId, null, () => go('', 'discounts'));
+}
+
+function renderCrumbs(c) {
+  const box = $('crumbs'); box.replaceChildren();
+  const add = (text, fn) => { if (box.childNodes.length) box.append(el('span', 'sep', '›')); if (fn) { const b = el('button', null, text); b.type = 'button'; b.addEventListener('click', fn); box.append(b); } else box.append(el('b', null, text)); };
+  const home = el('a', null, 'Home'); home.href = 'index.html'; box.append(home);
+  const p = compareId && products[compareId];
+  const typed = (sec, t) => t && typesOf(sec).includes(t);
+  if (p) {
+    add(c ? c.name : '', () => go('')); add(p.category, () => go(p.category));
+    const t = typed(p.category, p.type) ? p.type : '';
+    if (t) add(t, () => go(p.category, 'browse', '', t));
+    if (p.brand) add(p.brand, () => go(p.category, 'browse', p.brand, t)); add(famName(p));
+  }
+  else if (viewMode === 'discounts') { add(c ? c.name : '', () => go('')); add('Discounts & coupons'); }
+  else if (sectionName) {
+    add(c ? c.name : '', () => go(''));
+    add(sectionName, typeName || brandName ? () => go(sectionName) : null);
+    if (typeName) add(typeName, brandName ? () => go(sectionName, 'browse', '', typeName) : null);
+    if (brandName) add(brandName);
+  }
+  else add(c ? c.name : 'All products');
+}
+
+// One card per family; sized families get chips (dot: green = in stock somewhere here).
+function renderCards(rows, v, c) {
+  const box = $('results'); box.replaceChildren(); box.setAttribute('aria-busy', 'false');
+  const byFam = {};
+  rows.forEach(r => { const f = famOf(products[r.p]); (byFam[f] = byFam[f] || []).push(r); });
+  if (v.product && products[v.product] && !byFam[famOf(products[v.product])]) byFam[famOf(products[v.product])] = [];
+  // In a section, products no store here lists (yet) get a card too, with links to search each store, so the whole
+  // catalog can be browsed; filters that need an offer leave them out.
+  if (sectionName && !v.instock && !v.store && !v.pmin && !v.pmax && !v.coupon && !v.confirmed) {
+    DATA.products.filter(p => p.category === sectionName && (!typeName || p.type === typeName) && (!brandName || p.brand === brandName)
+      && (!v.product || p.id === v.product) && (!v.q || p.name.toLowerCase().includes(v.q)))
+      .forEach(p => { const f = famOf(p); if (!byFam[f]) byFam[f] = []; });
+  }
+  const cards = Object.keys(byFam).map(f => ({ fam: f, members: families[f] || [], rows: byFam[f] }))
+    .map(x => Object.assign(x, { availCount: x.rows.filter(AVAIL).length, m: cardMetrics(x) }))
+    .filter(x => !v.instock || x.availCount)
+    .sort(sorter(v.sort));
+  if (!cards.length) { box.append(el('div', 'card empty', v.instock ? 'Nothing matching is in stock right now. Turn off “In stock only” to see everything.' : 'No results for this view.')); return; }
+  // One block per next tree level: all products by section; a typed section by type; a section or type by brand.
+  const byType = !!(sectionName && !typeName && !brandName && typesOf(sectionName).length);
+  const byBrand = !byType && !!(sectionName && !brandName);
+  const keyOf = (x) => byType ? (x.members[0].type || 'Other') : byBrand ? (x.members[0].brand || 'Other') : (x.members[0].category || 'Other');
+  const order = byType ? typesOf(sectionName) : byBrand ? brandsOf(sectionName, typeName) : (DATA.sections || []).map(s => s.name), pos = (n) => { const i = order.indexOf(n); return i < 0 ? 99 : i; };
+  [...new Set(cards.map(keyOf))].sort((a, b) => pos(a) - pos(b)).forEach(name => {
+    const list = cards.filter(x => keyOf(x) === name);
+    const sec = (DATA.sections || []).find(s => s.name === (byType || byBrand ? sectionName : name)) || {};
+    const head = el('div', 'sec-h'), avail = `${list.filter(x => x.availCount).length} of ${list.length} available`;
+    if (byType || byBrand) {
+      const b = el('button', 'brand-h', name); b.type = 'button'; b.title = `Only ${name}`;
+      b.addEventListener('click', () => byType ? go(sectionName, 'browse', '', name) : go(sectionName, 'browse', name, typeName));
+      const h = el('h2'); h.append(b); head.append(h, el('span', null, avail));
+    } else head.append(el('h2', null, `${sec.icon || ''} ${name}${typeName ? ' · ' + typeName : ''}${brandName ? ' · ' + brandName : ''}`.trim()), el('span', null, avail));
+    let grid;
+    if (viewStyle === 'list') { grid = el('div', 'card lview'); list.forEach(x => grid.append(familyRow(x, c, v))); }
+    else { grid = el('div', 'grid' + (viewStyle === 'big' ? ' big' : '')); list.forEach(x => grid.append(familyCard(x, c, v))); }
+    box.append(head, grid);
+  });
+}
+
+// Sort by: what each card is ordered on (its cheapest available offer, the biggest gap between stores for one size,
+// how many stores have it, when it last came into stock). Available cards always come first, then by name.
+function cardMetrics(x) {
+  const a = x.rows.filter(AVAIL), priced = a.filter(r => r.pr != null), byP = {};
+  priced.forEach(r => (byP[r.p] = byP[r.p] || []).push(eff(r)));
+  return { min: priced.length ? Math.min(...priced.map(eff)) : Infinity,
+           saving: Math.max(0, ...Object.values(byP).map(l => Math.max(...l) - Math.min(...l))),
+           stores: new Set(a.map(r => r.s)).size,
+           since: Math.max(0, ...a.filter(r => r.st === 'InStock' && r.since).map(r => +new Date(r.since))) };
+}
+function sorter(kind) {
+  const name = (x) => famName(x.members[0]), none = (x) => x.availCount > 0 ? 0 : 1;
+  const by = { 'price-asc': (a, b) => a.m.min - b.m.min, 'price-desc': (a, b) => b.m.min - a.m.min, saving: (a, b) => b.m.saving - a.m.saving,
+               stores: (a, b) => b.m.stores - a.m.stores, newest: (a, b) => b.m.since - a.m.since };
+  return (a, b) => none(a) - none(b) || (by[kind] ? by[kind](a, b) : 0) || name(a).localeCompare(name(b));
+}
+
+// List view: one compact row per model with its size chips, best price, number of stores and a Compare button.
+function familyRow(x, c, v) {
+  const members = v.product ? x.members.filter(p => p.id === v.product) : x.members;
+  const availOf = (p) => x.rows.filter(r => r.p === p.id && AVAIL(r)).sort((a, b) => eff(a) - eff(b));
+  if (!pickedSize[x.fam] || !members.some(p => p.id === pickedSize[x.fam])) {
+    const withStock = members.map(p => ({ p, a: availOf(p) })).filter(m => m.a.length).sort((a, b) => eff(a.a[0]) - eff(b.a[0]));
+    pickedSize[x.fam] = (withStock[0] || { p: members[0] }).p.id;
+  }
+  const p = products[pickedSize[x.fam]], avail = availOf(p), cur = c.currency, row = el('div', 'lrow');
+  const pic = photoEl(p, 'thumb'); pic.addEventListener('click', () => openCompare(p.id));
+  const nm = el('div', 'lname'), name = el('button', 'pname', famName(p)); name.type = 'button'; name.addEventListener('click', () => openCompare(p.id));
+  nm.append(name, el('div', 'meta', [p.brand, p.group ? 'All models' : '', checkNote(p)].filter(Boolean).join(' · ')));
+  if (members.length > 1) nm.append(sizeChips(members, (q) => availOf(q).length, p.id, (id) => { pickedSize[x.fam] = id; render(); }));
+  const pr = el('div', 'lprice'), best = p.group ? avail[0] : bestPrice(avail);
+  if (best) pr.append(el('b', null, (p.group ? 'from ' : '') + money(cur, eff(best))), el('div', 'small', p.group ? `${avail.length} models` : `at ${stores[best.s].name}`));
+  else pr.append(el('span', 'small', x.rows.length ? 'Not in stock right now' : 'Not listed here yet'));
+  const sv = p.group ? null : savingOf(best, avail); if (sv) pr.append(saveEl(sv, cur));
+  const n = new Set(avail.map(r => r.s)).size;
+  const act = el('div', 'lact'), btn = el('button', 'btn ghost small', avail.length ? (p.group ? 'See models' : 'Compare') : 'Search');
+  btn.type = 'button'; btn.addEventListener('click', () => openCompare(p.id)); act.append(trackBtn(p, true), btn);
+  row.append(pic, nm, pr, el('div', 'lstores', n ? `${n} store${n > 1 ? 's' : ''}` : '—'), act);
+  return row;
+}
+
+function familyCard(x, c, v) {
+  const card = el('div', 'card pcard');
+  const members = v.product ? x.members.filter(p => p.id === v.product) : x.members;
+  const availOf = (p) => x.rows.filter(r => r.p === p.id && AVAIL(r)).sort((a, b) => eff(a) - eff(b));
+  if (!pickedSize[x.fam] || !members.some(p => p.id === pickedSize[x.fam])) {
+    const withStock = members.map(p => ({ p, a: availOf(p) })).filter(m => m.a.length).sort((a, b) => eff(a.a[0]) - eff(b.a[0]));
+    pickedSize[x.fam] = (withStock[0] || { p: members[0] }).p.id;
+  }
+  const p = products[pickedSize[x.fam]];
+  const head = el('div', 'phead'), txt = el('div'), pic = photoEl(p, 'photo');
+  pic.addEventListener('click', () => openCompare(p.id));
+  const name = el('button', 'pname', famName(p)); name.type = 'button'; name.title = 'Compare every store';
+  name.addEventListener('click', () => openCompare(p.id));
+  txt.append(name, el('div', 'meta', [p.brand, p.group ? 'All models' : '', checkNote(p)].filter(Boolean).join(' · ')));
+  head.append(pic, txt, trackBtn(p, true)); card.append(head);
+  if (members.length > 1) card.append(sizeChips(members, (q) => availOf(q).length, p.id, (id) => { pickedSize[x.fam] = id; render(); }));
+
+  const avail = availOf(p), cur = c.currency;
+  const line = el('div', 'bestline');
+  if (p.group) {
+    const n = new Set(avail.map(r => r.s)).size;
+    if (avail.length) line.append(el('b', null, `${avail.length} model${avail.length > 1 ? 's' : ''} available`), document.createTextNode(` at ${n} store${n > 1 ? 's' : ''} · from ${money(cur, eff(avail[0]))}`));
+    else line.textContent = 'No models available right now';
+    card.append(line);
+    avail.slice(0, viewStyle === 'big' ? 5 : 3).forEach(r => card.append(modelRow(r, p, cur)));
+  } else {
+    const best = bestPrice(avail), n = new Set(avail.filter(r => r.st === 'InStock').map(r => r.s)).size;
+    if (best) line.append(el('b', null, `Best price ${money(cur, eff(best))}`), document.createTextNode(` at ${stores[best.s].name} · ${n ? `in stock at ${n} store${n > 1 ? 's' : ''}` : 'not confirmed'}`));
+    else line.textContent = x.rows.length ? 'Not in stock anywhere right now' : 'Not listed at the stores here yet';
+    const sv = savingOf(best, avail); if (sv) { line.append(' '); line.append(saveEl(sv, cur, 'chip')); }
+    card.append(line);
+    avail.slice(0, viewStyle === 'big' ? 6 : 4).forEach(r => {
+      const row = el('div', 'offer'), s = stores[r.s];
+      const left = el('div'); left.append(storeName(s, r.c ? 'Pick-up: ' + r.c : ''));
+      const right = el('div', 'side-r');
+      const pr = el('div', 'price', money(cur, r.pr)); if (r === best) pr.append(el('span', 'badge', 'Best'));
+      right.append(pr); const d = vsBest(r, best, cur); if (d && r !== best) right.append(el('div', 'diff', d));
+      row.append(left, right);
+      const cl = couponLine(r, cur); if (cl) { cl.style.gridColumn = '1 / -1'; row.append(cl); }
+      if (r.st === 'Unverified') { const u = el('div', 'sub'); u.append(el('span', 'pill Unverified', 'Unconfirmed'), document.createTextNode(' ' + (r.t || ''))); row.append(u); }
+      card.append(row);
+    });
+  }
+  const btn = el('button', 'btn ghost block', avail.length ? (p.group ? `See all ${avail.length} models` : `Compare ${avail.length} store${avail.length > 1 ? 's' : ''}`) : 'Search the stores');
+  btn.type = 'button'; btn.addEventListener('click', () => openCompare(p.id));
+  card.append(btn);
+  return card;
+}
+
+function sizeChips(members, availCount, selected, onPick) {
+  const box = el('div', 'chips');
+  members.forEach(q => {
+    const n = availCount(q);
+    const b = el('button', 'chip' + (q.id === selected ? ' on' : '') + (n ? '' : ' na')); b.type = 'button';
+    b.setAttribute('aria-pressed', String(q.id === selected)); b.setAttribute('aria-label', `${q.size || q.name}, ${n ? n + ' offer' + (n > 1 ? 's' : '') + ' available' : 'not available'}`);
+    b.append(el('span', 'dot' + (n ? ' ok' : '')), document.createTextNode(q.size || q.name));
+    b.title = n ? `${n} offer${n > 1 ? 's' : ''} available` : 'Not available right now';
+    b.addEventListener('click', () => onPick(q.id));
+    box.append(b);
+  });
+  return box;
+}
+
+function modelRow(r, p, cur) {
+  const s = stores[r.s], row = el('div', 'model');
+  row.append(photoEl(p, 'thumb', r.im));
+  const mid = el('div'); mid.append(Object.assign(el('div', 'mt', r.t || p.name), { title: r.t || '' }));
+  const ms = el('div', 'ms'); ms.append(storeName(s, r.c ? 'Pick-up: ' + r.c : ''));
+  if (r.st === 'Unverified') ms.append(el('span', 'pill Unverified', 'Unconfirmed'));
+  mid.append(ms);
+  const side = el('div', 'side-r'); side.append(el('div', 'price', money(cur, eff(r))));
+  if (r.cp) side.append(el('span', 'coupon', '🏷 coupon'));
+  const href = linkFor(r, s, p); if (href) { side.append(el('br')); side.append(extLink(href, 'View ›', 'small')); }
+  // The listing is one of the products checked one by one: open its comparison or track it.
+  const q = p.group ? catalogProductFor(r.t, p) : null;
+  if (q) {
+    const b = el('button', 'mq', `Compare ${q.name} ›`); b.type = 'button'; b.addEventListener('click', () => openCompare(q.id)); mid.append(b);
+    side.append(el('br'), trackBtn(q, true));
+  }
+  row.append(mid, side);
+  return row;
+}
+
+// Model lists follow the page's Big / Grid / List choice; the comparison gets its own copy of the switch.
+const modelsClass = () => 'models' + (viewStyle === 'big' ? ' big' : viewStyle === 'list' ? ' list' : '');
+function viewSwitch() {
+  const seg = $('viewSeg').cloneNode(true); seg.removeAttribute('id');
+  seg.querySelectorAll('button').forEach(b => {
+    b.setAttribute('aria-pressed', String(b.dataset.view === viewStyle));
+    b.addEventListener('click', () => { viewStyle = b.dataset.view; localStorage.setItem('radarViewStyle', viewStyle); syncSeg(); render(); });
+  });
+  return seg;
+}
+
+// The catalog product a model-list listing is ("Apple iPhones (all models)" -> iPhone Duo 512GB): same brand and
+// section, every word of its name in the title; the longest name wins, so "Pro Max" beats "Pro".
+const matchWords = (t) => ` ${String(t || '').toLowerCase().replace(/\+/g, ' plus ').replace(/[^\p{L}\p{N}]+/gu, ' ').replace(/(\d+) (gb|tb)\b/g, '$1$2')} `;
+const productWords = {}, productFor = {};
+function catalogProductFor(title, group) {
+  const key = group.id + '|' + title;
+  if (key in productFor) return productFor[key];
+  const t = matchWords(title); let best = null, bestN = 0;
+  DATA.products.forEach(q => {
+    if (q.group || q.brand !== group.brand || q.category !== group.category) return;
+    const w = productWords[q.id] || (productWords[q.id] = matchWords(q.name).trim().split(' ').filter(Boolean));
+    if (w.length > bestN && w.every(x => t.includes(` ${x} `))) { best = q; bestN = w.length; }
+  });
+  return (productFor[key] = best);
+}
+
+// A brand's model list shows each store's cheapest models only, so the brand's products checked one by one are listed
+// under it, to compare or track (in stock first).
+function trackModels(p, v, cur) {
+  const singles = DATA.products.filter(q => !q.group && q.brand === p.brand && q.category === p.category);
+  if (!singles.length) return null;
+  const card = el('div', 'card'); card.style.marginTop = '14px';
+  const h = el('div', 'block-h'); h.append(el('h2', null, `Track ${/^[aeiou]/i.test(p.brand) ? 'an' : 'a'} ${p.brand} model`), el('span', null, 'Tap ☆ to see its stock on the home page'));
+  const grid = el('div', modelsClass());
+  singles.map(q => ({ q, a: rowsFor(v, q.id).filter(AVAIL).sort((x, y) => eff(x) - eff(y)) }))
+    .sort((x, y) => (y.a.length ? 1 : 0) - (x.a.length ? 1 : 0) || (y.q.hot ? 1 : 0) - (x.q.hot ? 1 : 0) || x.q.name.localeCompare(y.q.name))
+    .forEach(({ q, a }) => {
+      const row = el('div', 'model'), mid = el('div'), side = el('div', 'side-r');
+      const pic = photoEl(q, 'thumb'); pic.addEventListener('click', () => openCompare(q.id));
+      const nm = el('button', 'mlink', q.name); nm.type = 'button'; nm.addEventListener('click', () => openCompare(q.id));
+      const n = new Set(a.map(r => r.s)).size;
+      const ms = el('div', 'ms', n ? `Available at ${n} store${n > 1 ? 's' : ''} · from ${money(cur, eff(a[0]))}` : 'Not available right now');
+      const sv = savingOf(bestPrice(a), a); if (sv) ms.append(saveEl(sv, cur));
+      mid.append(nm, ms);
+      side.append(trackBtn(q, true));
+      row.append(pic, mid, side); grid.append(row);
+    });
+  card.append(h, grid);
+  return card;
+}
+
+function searchYourself(list, p, v, skip) {
+  // Stores here that don't list it as available. Out-of-stock stores are left out entirely, and so are the ones
+  // shown with another size of it (skip).
+  const out = new Set(list.filter(r => r.st === 'OutOfStock').map(r => r.s));
+  const others = DATA.stores.filter(s => s.country === v.country && !out.has(s.id) && !(skip && skip.has(s.id)) && !list.some(r => r.s === s.id && AVAIL(r))
+    && (!v.city || !(s.cities && s.cities.length) || s.cities.includes(v.city)));
+  if (!others.length) return null;
+  const d = el('div', 'rest'); d.style.padding = '0 20px 18px';
+  d.append(document.createTextNode('Not listed or not checked; search it yourself at '));
+  others.forEach((s, i) => { if (i) d.append(', '); const h = linkFor(null, s, p); d.append(h ? extLink(h, s.name) : document.createTextNode(s.name)); });
+  return d;
+}
+
+// Comparison: product hero with size chips, then one column per store (cheapest first), side by side.
+function renderCompare(v, c) {
+  const p = products[compareId], box = $('compare'), cur = c ? c.currency : '';
+  box.replaceChildren();
+  const all = rowsFor(v, p.id);
+  const list = all.filter(AVAIL).sort((a, b) => (a.st === 'InStock' ? 0 : 1) - (b.st === 'InStock' ? 0 : 1) || eff(a) - eff(b));
+  const best = p.group ? null : bestPrice(list);
+  const nStores = new Set(list.map(r => r.s)).size;
+
+  const hero = el('div', 'card hero'), mid = el('div');
+  mid.append(el('h1', null, famName(p)), el('div', 'meta', [p.brand, p.category, c ? c.name + (v.city ? ' · ' + v.city : '') : '',
+    checkNote(p, true)].filter(Boolean).join(' · ')));
+  const fam = families[famOf(p)] || [p];
+  if (fam.length > 1) {
+    const lab = el('div', 'small'); lab.style.margin = '12px 0 6px'; lab.append(document.createTextNode('Size'), info('Green dot: in stock at a store here'));
+    const counts = {}; ROWS.rows.forEach(r => { if (AVAIL(r) && fam.some(q => q.id === r.p)) counts[r.p] = (counts[r.p] || 0) + 1; });
+    mid.append(lab, sizeChips(fam, (q) => counts[q.id] || 0, p.id, (id) => { compareId = id; render(); }));
+  }
+  const kpis = el('div', 'kpis');
+  const kpi = (big, small) => { const k = el('div', 'kpi'); k.append(el('b', null, big), el('span', null, small)); kpis.append(k); };
+  if (p.group) {
+    kpi(String(list.length), `models available at ${nStores} store${nStores === 1 ? '' : 's'}`);
+    if (list.length) kpi(money(cur, eff(list[0])), `cheapest · ${stores[list[0].s].name}`);
+  } else {
+    if (best) kpi(money(cur, eff(best)), `Best price · ${stores[best.s].name}${best.cpr != null && best.cpr < best.pr ? ' (with coupon)' : ''}`);
+    else kpi('—', 'No store has it available right now');
+    const sv = savingOf(best, list);
+    if (sv) kpi(`${money(cur, Math.round(sv.amt))} (${Math.round(sv.pct * 100)}%)`, `You save vs ${stores[sv.hi.s].name}`);
+    kpi(`${nStores}`, `store${nStores === 1 ? '' : 's'} have it available`);
+  }
+  mid.append(kpis);
+  const back = el('button', 'btn line', '‹ Back'); back.type = 'button'; back.addEventListener('click', () => go(p.category));
+  const act = el('div', 'hero-act'); act.append(back, trackBtn(p));
+  hero.append(photoEl(p, 'photo big'), mid, act);
+  box.append(hero);
+
+  const block = el('div', 'card'); block.style.marginTop = '14px';
+  const bh = el('div', 'block-h');
+  bh.append(el('h2', null, p.group ? 'Every available model' : `Compare ${nStores} store${nStores === 1 ? '' : 's'}`),
+    el('span', null, p.group ? 'cheapest first' : 'cheapest first · scroll sideways for more'));
+  block.append(bh);
+  if (!list.length) block.append(el('div', 'empty', `No store has ${fam.length > 1 ? 'this size' : 'it'} available right now. Out-of-stock stores are hidden.`));
+  else if (p.group) {
+    const filter = el('input'); filter.type = 'search'; filter.placeholder = 'Filter models, e.g. 60 cm, 9 kg, inverter'; filter.setAttribute('aria-label', 'Filter models');
+    const fwrap = el('div', 'mtools'); fwrap.append(filter, viewSwitch());
+    const grid = el('div', modelsClass());
+    const draw = () => { grid.replaceChildren(); const f = filter.value.trim().toLowerCase();
+      list.filter(r => !f || (r.t || '').toLowerCase().includes(f) || stores[r.s].name.toLowerCase().includes(f)).slice(0, 300).forEach(r => grid.append(modelRow(r, p, cur))); };
+    filter.addEventListener('input', draw);
+    block.append(fwrap, grid); draw();
+  } else {
+    const { wrap, strip } = makeStrip();
+    const sv = savingOf(best, list);
+    list.forEach(r => strip.append(storeColumn(r, p, best, cur, sv)));
+    block.append(wrap);
+  }
+  // Stores without this size that have another size of it, so every store carrying the product shows up (cheapest
+  // offer per size, labelled; a size opens its own comparison).
+  const have = new Set(list.map(r => r.s)), altBy = {};
+  if (!p.group) fam.filter(q => q.id !== p.id).forEach(q => rowsFor(v, q.id).filter(r => AVAIL(r) && !have.has(r.s)).forEach(r => {
+    const m = altBy[r.s] || (altBy[r.s] = {});
+    if (!m[q.id] || eff(r) < eff(m[q.id])) m[q.id] = r;
+  }));
+  const altStores = Object.keys(altBy).map(id => ({ s: stores[id], rs: Object.values(altBy[id]).sort((a, b) => eff(a) - eff(b)) }))
+    .sort((a, b) => eff(a.rs[0]) - eff(b.rs[0]));
+  const sy = searchYourself(all, p, v, new Set(Object.keys(altBy))); if (sy) block.append(sy);
+  box.append(block);
+  if (p.group) { const tm = trackModels(p, v, cur); if (tm) box.append(tm); }
+  if (altStores.length) {
+    const ab = el('div', 'card'); ab.style.marginTop = '14px';
+    const ah = el('div', 'block-h');
+    ah.append(el('h2', null, `Other sizes at ${altStores.length} more store${altStores.length > 1 ? 's' : ''}`), el('span', null, `${p.size || 'this size'} isn’t listed there`));
+    const { wrap, strip } = makeStrip();
+    altStores.forEach(({ s, rs }) => {
+      const col = el('div', 'col'); col.append(storeName(s, ''));
+      rs.slice(0, 4).forEach(r => {
+        const q = products[r.p], line = el('div', 'alt');
+        const sz = el('button', 'chip', q.size || q.name); sz.type = 'button'; sz.title = 'Compare this size';
+        sz.addEventListener('click', () => { compareId = q.id; render(); });
+        const right = el('div', 'side-r'); right.append(el('div', 'price', money(cur, eff(r))));
+        if (r.st === 'Unverified') right.append(el('span', 'pill Unverified', 'Unconfirmed'));
+        const href = linkFor(r, s, q); if (href) right.append(extLink(href, 'View ›', 'small'));
+        line.append(sz, right); col.append(line);
+      });
+      strip.append(col);
+    });
+    ab.append(ah, wrap);
+    box.append(ab);
+  }
+
+  // The same product elsewhere: cheapest confirmed offer per country, roughly converted into this country's currency.
+  if (!p.group && c) {
+    const others = (DATA.best || []).filter(b => b.p === p.id && b.c !== v.country && countries[b.c] && stores[b.s])
+      .map(b => Object.assign({ conv: countries[b.c].usdRate && c.usdRate ? b.pr / countries[b.c].usdRate * c.usdRate : null }, b))
+      .sort((a, b) => (a.conv ?? 1e15) - (b.conv ?? 1e15));
+    if (others.length) {
+      const ob = el('div', 'card'); ob.style.marginTop = '14px';
+      const oh = el('div', 'block-h'); oh.append(el('h2', null, 'Cheapest in other countries'), el('span', null, '≈ approximate exchange rates'));
+      const { wrap, strip } = makeStrip();
+      others.forEach(o => {
+        const k = countries[o.c], s = stores[o.s], col = el('div', 'col country');
+        col.append(el('b', null, k.name), storeName(s, ''), el('div', 'bigprice', money(k.currency, o.pr)));
+        if (o.conv != null && cur !== k.currency) col.append(el('div', 'diff', '≈ ' + money(cur, Math.round(o.conv))));
+        col.append(Object.assign(el('div', 'listing', o.t || ''), { title: o.t || '' }));
+        const href = safeUrl(o.u); if (href) col.append(extLink(href, 'View', 'btn line small'));
+        strip.append(col);
+      });
+      ob.append(oh, wrap, Object.assign(el('div', 'rest', 'Warranty, phone region and import rules can differ between countries.'), { style: 'padding:0 20px 18px' }));
+      box.append(ob);
+    }
+  }
+}
+
+// Sideways rows of columns: ‹ › buttons move one column, a normal mouse wheel scrolls sideways while over the row
+// (only while it can still move that way), fades show more is hidden; touch swiping works as usual.
+function makeStrip() {
+  const wrap = el('div', 'strip-wrap'), strip = el('div', 'strip');
+  const left = el('button', 'sarrow l', '‹'), right = el('button', 'sarrow r', '›');
+  left.type = 'button'; right.type = 'button'; left.setAttribute('aria-label', 'Scroll left'); right.setAttribute('aria-label', 'Scroll right');
+  const step = () => { const c = strip.querySelector('.col'); return c ? c.getBoundingClientRect().width + 12 : 240; };
+  const update = () => {
+    const max = strip.scrollWidth - strip.clientWidth, atL = strip.scrollLeft <= 2, atR = strip.scrollLeft >= max - 2;
+    left.hidden = atL; right.hidden = atR || max <= 2;
+    wrap.classList.toggle('can-left', !atL); wrap.classList.toggle('can-right', !atR && max > 2);
+  };
+  left.addEventListener('click', () => strip.scrollBy({ left: -step(), behavior: motion }));
+  right.addEventListener('click', () => strip.scrollBy({ left: step(), behavior: motion }));
+  strip.addEventListener('scroll', update, { passive: true });
+  strip.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;   // trackpads already scroll sideways
+    const max = strip.scrollWidth - strip.clientWidth;
+    if ((e.deltaY > 0 && strip.scrollLeft < max - 1) || (e.deltaY < 0 && strip.scrollLeft > 1)) { strip.scrollLeft += e.deltaY; e.preventDefault(); }
+  }, { passive: false });
+  if (window.ResizeObserver) new ResizeObserver(update).observe(strip); else window.addEventListener('resize', update);
+  wrap.append(left, strip, right);
+  requestAnimationFrame(update); setTimeout(update, 60);   // once the columns are in and laid out
+  return { wrap, strip };
+}
+
+function storeColumn(r, p, best, cur, sv) {
+  const s = stores[r.s], col = el('div', 'col' + (r === best ? ' best' : ''));
+  if (r === best) col.append(el('span', 'ribbon', 'Best price'));
+  col.append(storeName(s, ''));
+  const where = el('div', 'small', r.c ? 'Pick-up in ' + r.c : (s.cities && s.cities.length ? s.cities.join(', ') : 'Online · delivers nationwide'));
+  const stl = el('div'); stl.append(el('span', 'pill ' + r.st, LABEL[r.st]));
+  if (r.st === 'Unverified') stl.append(info('The store lists it but doesn’t clearly say it’s in stock: check before you go.'));
+  col.append(where, stl, el('div', 'bigprice', money(cur, r.pr)));
+  if (r === best && sv) col.append(saveEl(sv, cur));
+  const cl = couponLine(r, cur); if (cl) col.append(cl);
+  const d = vsBest(r, best, cur); if (d && r !== best) col.append(el('div', 'diff', d));
+  col.append(Object.assign(el('div', 'listing', [r.t, r.n].filter(Boolean).join(' · ')), { title: r.t || '' }));
+  if (r.since) col.append(el('div', 'small', (r.st === 'InStock' ? 'In stock since ' : 'Since ') + ago(r.since) + (r.stale ? ' · last check failed' : '')));
+  const href = linkFor(r, s, p);
+  if (href) col.append(extLink(href, r.st === 'InStock' ? 'Buy now' : 'View offer', 'btn ' + (r.st === 'InStock' ? 'primary' : 'ghost')));
+  return col;
+}
+
+// Discount cards (Fazaa, Esaad...) accepted by stores here, and store coupons on tracked products right now.
+function renderDiscounts(v, c) {
+  const box = $('discounts'); box.replaceChildren();
+  const cur = c ? c.currency : '', d = DATA.discounts || {};
+  const card1 = el('div', 'card card-pad');
+  const h1 = el('h2', null, 'Discount cards'); h1.style.margin = '0 0 4px'; card1.append(h1, el('div', 'small', 'Show your card or use the store’s code at checkout, as each store explains.'));
+  const offers = (d.offers || []).filter(o => !o.country || o.country === v.country);
+  if (!offers.length) card1.append(el('p', 'small', `No discount-card offers confirmed for ${c ? c.name : 'this country'} yet.`));
+  (d.programs || []).forEach(pg => {
+    const mine = offers.filter(o => o.program === pg.id); if (!mine.length) return;
+    const h = el('h3', null, pg.name); h.style.margin = '16px 0 2px'; card1.append(h);
+    if (pg.who) card1.append(el('div', 'small', pg.who));
+    mine.forEach(o => {
+      const e = el('div', 'offer-card'); e.append(el('b', null, o.storeName || o.store), el('div', null, o.discount || 'Discount for card holders'));
+      const det = [o.where, o.how, o.conditions].filter(Boolean).join(' · '); if (det) e.append(el('div', 'small', det));
+      const src = safeUrl(o.source); if (src) { const s = el('div', 'small'); s.append(extLink(src, 'Store’s terms'), document.createTextNode(o.checked ? ` · checked ${o.checked}` : '')); e.append(s); }
+      card1.append(e);
+    });
+  });
+  const card2 = el('div', 'card'); card2.style.marginTop = '14px';
+  const bh = el('div', 'block-h'); bh.append(el('h2', null, 'Store coupons right now'), el('span', null, 'biggest saving first'));
+  card2.append(bh);
+  const list = rowsFor(v).filter(r => AVAIL(r) && r.cp).sort((a, b) => ((b.pr - (b.cpr ?? b.pr)) - (a.pr - (a.cpr ?? a.pr))));
+  if (!list.length) card2.append(el('div', 'empty', 'No coupons on tracked products in this country right now.'));
+  else {
+    const grid = el('div', 'models');
+    list.slice(0, 120).forEach(r => {
+      const p = products[r.p], s = stores[r.s], row = el('div', 'model');
+      row.append(photoEl(p, 'thumb', r.im));
+      const mid = el('div'); const name = el('button', 'pname', p.name); name.style.fontSize = '14px'; name.type = 'button'; name.addEventListener('click', () => openCompare(p.id));
+      const ms = el('div', 'ms'); ms.append(storeName(s, ''), el('span', 'coupon', '🏷 ' + r.cp)); mid.append(name, ms);
+      const side = el('div', 'side-r'); side.append(el('div', 'price', money(cur, eff(r))));
+      if (r.cpr != null && r.cpr < r.pr) side.append(Object.assign(el('div', 'small', money(cur, r.pr)), { style: 'text-decoration:line-through' }));
+      const href = linkFor(r, s, p); if (href) side.append(extLink(href, 'View ›', 'small'));
+      row.append(mid, side); grid.append(row);
+    });
+    card2.append(grid);
+  }
+  box.append(card1, card2);
+}
+
+function renderSide(v) {
+  const hist = $('history'); hist.replaceChildren();
+  const hs = (ROWS.history || []).filter(h => stores[h.store] && products[h.product] && (!v.product || h.product === v.product)).slice(-12).reverse();
+  if (!hs.length) hist.append(el('li', 'small', 'No changes yet.'));
+  hs.forEach(h => {
+    const li = el('li'); li.append(el('span', 'dot ' + (h.to === 'InStock' ? 'ok' : '')), document.createTextNode(' '), el('b', null, products[h.product].name + ' '),
+      document.createTextNode(`at ${stores[h.store].name}${h.city ? ' (' + h.city + ')' : ''}: ${LABEL[h.from] || h.from} → ${LABEL[h.to] || h.to} · ${ago(h.time)}`));
+    hist.append(li);
+  });
+  const sl = $('storeList'); sl.replaceChildren();
+  const failing = new Set((DATA.problems || []).map(p => p.s));
+  DATA.stores.filter(s => s.country === v.country).sort((a, b) => a.name.localeCompare(b.name)).forEach(s => {
+    const li = el('li'), href = safeUrl(s.url);
+    const nm = storeName(s, s.cities && s.cities.length ? s.cities.join(', ') : 'delivers nationwide');
+    li.append(href ? Object.assign(extLink(href, ''), { style: 'color:inherit' }) : el('span'));
+    li.firstChild.append(nm);
+    if (failing.has(s.id)) li.append(el('span', 'small', " · couldn't be checked recently"));
+    sl.append(li);
+  });
+}
+
+// Side card: when results were last updated and roughly how long until the next check.
+function tick() {
+  if (!DATA) return;
+  // The UAE is checked every 30 minutes; the other countries one at a time, a few hours apart.
+  const uae = $('country').value === 'AE', at = (ROWS && ROWS.updated) || (uae ? DATA.generatedAt : '');
+  const every = uae ? (DATA.intervalMinutes || 15) : Math.max(1, DATA.countries.length - 1) * (DATA.rotateHours || 2) * 60;
+  const mins = at ? (Date.now() - new Date(at)) / 60000 : every;
+  $('liveTitle').textContent = at ? `Updated ${ago(at)}` : 'Not checked yet';
+  $('liveBar').style.width = Math.min(100, mins / every * 100) + '%';
+  if (refreshing) { $('liveSub').textContent = refreshing; return; }
+  const left = every - mins;
+  $('liveSub').textContent = !at ? 'Checked in turn with the other countries; the first results can take a few hours.'
+    : mins > every * 4 ? 'Checks are running late; this page updates by itself.'
+    : mins >= every ? 'Next check any moment now'
+    : left >= 90 ? `Next check in about ${Math.round(left / 60)} h` : `Next check in about ${Math.max(1, Math.round(left))} min`;
+}
+
+async function load(first) {
+  try { DATA = await loadScript('data.js', () => window.RADAR_DATA); }
+  catch {
+    if (first) {
+      $('liveTitle').textContent = 'Results are not available yet'; $('liveSub').textContent = 'Try again in a few minutes.';
+      $('results').replaceChildren(el('div', 'card empty', 'Results are not available yet. Try again in a few minutes.')); $('results').setAttribute('aria-busy', 'false');
+    }
+    return;
+  }
+  stores = {}; DATA.stores.forEach(s => stores[s.id] = s);
+  products = {}; families = {};
+  DATA.products.forEach(p => { products[p.id] = p; (families[famOf(p)] = families[famOf(p)] || []).push(p); });
+  countries = {}; DATA.countries.forEach(c => countries[c.code] = c);
+  if (DATA.title) $('title').textContent = DATA.title;
+  const req = safeUrl(DATA.requestUrl || ''); $('request').hidden = !req; if (req) $('requestLink').href = req;
+  const start = first ? readHash() : view();
+  if (first) {
+    compareId = products[start.compare] ? start.compare : '';
+    sectionName = (DATA.sections || []).some(s => s.name === start.section) ? start.section : '';
+    typeName = sectionName && typesOf(sectionName).includes(start.type) ? start.type : '';
+    brandName = sectionName && brandsOf(sectionName, typeName).includes(start.brand) ? start.brand : '';
+    viewMode = start.view === 'discounts' ? 'discounts' : 'browse';
+    if (start.q) $('q').value = start.q;
+    if (['big', 'grid', 'list'].includes(start.layout)) { viewStyle = start.layout; localStorage.setItem('radarViewStyle', viewStyle); syncSeg(); }
+  }
+  fillFilters(start);
+  ROWS = await loadCountry($('country').value);
+  render(); tick();
+}
+
+$('country').addEventListener('change', async () => { fillCities(''); fillStores(''); ROWS = await loadCountry($('country').value); closeMenu(); render(); tick(); });
+['city', 'product', 'instock', 'store', 'sort', 'confirmed', 'coupon'].forEach(id => $(id).addEventListener('change', render));
+let priceTimer = null;
+['pmin', 'pmax'].forEach(id => $(id).addEventListener('input', () => { clearTimeout(priceTimer); priceTimer = setTimeout(render, 350); }));
+// View: big cards, grid or list; remembered on this device.
+let viewStyle = localStorage.getItem('radarViewStyle') || 'grid';
+const syncSeg = () => document.querySelectorAll('#viewSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === viewStyle)));
+document.querySelectorAll('#viewSeg button').forEach(b => b.addEventListener('click', () => { viewStyle = b.dataset.view; localStorage.setItem('radarViewStyle', viewStyle); syncSeg(); render(); }));
+syncSeg();
+$('q').addEventListener('input', () => { if (compareId) compareId = ''; render(); });
+$('menuBtn').addEventListener('click', () => $('menuBtn').setAttribute('aria-expanded', String($('side').classList.toggle('open'))));
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('side').classList.contains('open')) { closeMenu(); $('menuBtn').focus(); } });
+// Refresh (only when the page is opened on this PC): asks Stock Radar to check this country and section now through
+// the stockradar:// link set up by install-local.ps1, then reloads the results until the new ones arrive.
+if (location.protocol === 'file:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) $('refreshBtn').hidden = false;
+let refreshWatch = null;
+$('refreshBtn').addEventListener('click', () => {
+  if (!DATA) return;
+  const code = $('country').value, p = compareId && products[compareId];
+  const sec = p ? p.category : (viewMode === 'browse' ? sectionName : '');
+  // Done when this country's own check time moves (another country's run finishing doesn't count).
+  const before = (ROWS && ROWS.updated) || '', started = Date.now(), b = $('refreshBtn');
+  const done = (msg) => { clearInterval(refreshWatch); refreshing = ''; b.disabled = false; b.textContent = '⟳ Refresh'; tick(); if (msg) $('liveSub').textContent = msg; };
+  refreshing = `Checking ${countries[code] ? countries[code].name : code}${sec ? ' · ' + sec : ''} now: new results appear here in a few minutes.`;
+  b.disabled = true; b.textContent = 'Checking…'; tick();
+  location.href = 'stockradar://refresh/' + code + (sec ? '/' + encodeURIComponent(sec) : '');
+  clearInterval(refreshWatch);
+  refreshWatch = setInterval(async () => {
+    if ($('country').value !== code) return done('');
+    await load(false);
+    if (((ROWS && ROWS.updated) || '') !== before) done('Updated with the new results.');
+    else if (Date.now() - started > 45 * 60000) done('The check didn’t finish. If the browser blocked it, double-click Refresh-Stock-Radar.cmd in the Stock Radar folder.');
+  }, 20000);
+});
+// Back/Forward: show the product, section or country that link step points to.
+window.addEventListener('popstate', async () => {
+  if (!DATA) return;
+  const h = readHash();
+  compareId = products[h.compare] ? h.compare : '';
+  sectionName = (DATA.sections || []).some(s => s.name === h.section) ? h.section : '';
+  typeName = sectionName && typesOf(sectionName).includes(h.type) ? h.type : '';
+  brandName = sectionName && brandsOf(sectionName, typeName).includes(h.brand) ? h.brand : '';
+  viewMode = h.view === 'discounts' ? 'discounts' : 'browse';
+  if (countries[h.country] && h.country !== $('country').value) { $('country').value = h.country; fillCities(h.city); ROWS = await loadCountry(h.country); }
+  render(); tick();
+});
+document.addEventListener('click', (e) => { const s = $('side'); if (s.classList.contains('open') && !s.contains(e.target) && e.target !== $('menuBtn')) closeMenu(); });
+$('shareBtn').addEventListener('click', async () => {
+  const b = $('shareBtn');
+  try { await navigator.clipboard.writeText(location.href); b.textContent = 'Link copied'; } catch { prompt('Copy this link:', location.href); }
+  setTimeout(() => { b.textContent = 'Share'; }, 1500);
+});
+load(true);
+setInterval(tick, 30000);
+setInterval(() => load(false), 180000);
+// Phone app (iOS/Android home screen): offline support when served over http(s); an Install button when the browser offers one.
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+let installPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installPrompt = e; const b = document.getElementById('installBtn'); if (b) b.hidden = false; });
+document.getElementById('installBtn').addEventListener('click', async () => { if (!installPrompt) return; installPrompt.prompt(); await installPrompt.userChoice; installPrompt = null; document.getElementById('installBtn').hidden = true; });</script>
+</body>
+</html>

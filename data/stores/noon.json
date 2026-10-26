@@ -1,0 +1,5 @@
+[
+  { "id": "noon-ae", "name": "Noon", "adapter": "noon", "country": "AE", "locale": "uae-en",    "xlocale": "en-ae", "url": "https://www.noon.com/uae-en/" },
+  { "id": "noon-sa", "name": "Noon", "adapter": "noon", "country": "SA", "locale": "saudi-en",  "xlocale": "en-sa", "url": "https://www.noon.com/saudi-en/" },
+  { "id": "noon-eg", "name": "Noon", "adapter": "noon", "country": "EG", "locale": "egypt-en",  "xlocale": "en-eg", "url": "https://www.noon.com/egypt-en/" }
+]

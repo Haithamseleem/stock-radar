@@ -1,0 +1,4 @@
+[
+  { "id": "emax-ae", "name": "Emax", "adapter": "emax", "country": "AE", "base": "https://uae.emaxme.com", "url": "https://uae.emaxme.com/",
+    "applicationId": 101, "tenantId": "5DF1363059675161A85F576D", "usdRate": 3.67 }
+]

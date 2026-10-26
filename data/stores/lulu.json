@@ -1,0 +1,9 @@
+[
+  { "id": "lulu-ae", "name": "Lulu", "adapter": "lulu", "country": "AE", "locale": "en-ae", "url": "https://www.luluhypermarket.com/en-ae/" },
+  { "id": "lulu-sa", "name": "Lulu", "adapter": "lulu", "country": "SA", "locale": "en-sa", "url": "https://www.luluhypermarket.com/en-sa/" },
+  { "id": "lulu-qa", "name": "Lulu", "adapter": "lulu", "country": "QA", "locale": "en-qa", "url": "https://www.luluhypermarket.com/en-qa/" },
+  { "id": "lulu-kw", "name": "Lulu", "adapter": "lulu", "country": "KW", "locale": "en-kw", "url": "https://www.luluhypermarket.com/en-kw/" },
+  { "id": "lulu-bh", "name": "Lulu", "adapter": "lulu", "country": "BH", "locale": "en-bh", "url": "https://www.luluhypermarket.com/en-bh/" },
+  { "id": "lulu-om", "name": "Lulu", "adapter": "lulu", "country": "OM", "locale": "en-om", "url": "https://www.luluhypermarket.com/en-om/" },
+  { "id": "lulu-eg", "name": "Lulu", "adapter": "lulu", "country": "EG", "locale": "en-eg", "url": "https://www.luluhypermarket.com/en-eg/", "disabled": true, "reason": "no Egypt online store: /en-eg answers 522 timeout and the site does not link to it" }
+]

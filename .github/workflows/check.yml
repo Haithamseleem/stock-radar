@@ -1,0 +1,111 @@
+# Every 15 minutes, which keeps eight machines per run within fair use of GitHub's free runners (GitHub may start scheduled
+# runs late; hot items each run, other sections every 3-12 runs): eight machines each check a share of the stores at
+# the same time, then one job merges their results, keeps state on the "data" branch, sends Telegram alerts
+# (TELEGRAM_BOT_TOKEN secret) and publishes the page to GitHub Pages.
+name: Stock check
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      test:
+        description: Send a test message to the Telegram channels instead of checking
+        type: boolean
+        default: false
+
+concurrency:
+  group: stock-check
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  test:
+    if: inputs.test
+    runs-on: windows-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - shell: powershell
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: ./tracker.ps1 -TestTelegram
+
+  check:
+    if: ${{ !inputs.test }}
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      # The saved schedule says which sections are due this run, so every machine picks the same products.
+      - name: Restore saved state
+        shell: bash
+        run: |
+          if git fetch -q --depth 1 origin data 2>/dev/null; then git checkout FETCH_HEAD -- . && git reset -q; fi
+      - name: Check this share of the stores
+        shell: powershell
+        env:
+          RADAR_SLOT: ${{ github.run_number }}
+        run: ./tracker.ps1 -Shard ${{ matrix.shard }} -Shards 8
+      - uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ matrix.shard }}
+          path: results-${{ matrix.shard }}.json
+          retention-days: 1
+
+  publish:
+    needs: check
+    if: ${{ !cancelled() && !inputs.test }}
+    runs-on: windows-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore saved state
+        shell: bash
+        run: |
+          if git fetch -q --depth 1 origin data 2>/dev/null; then git checkout FETCH_HEAD -- . && git reset -q; fi
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: results-*
+          merge-multiple: true
+
+      - name: Merge, alert and build the page
+        id: merge
+        shell: powershell
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: ./tracker.ps1 -Merge
+
+      # One orphan commit, force-pushed, so the data branch never grows.
+      - name: Save state
+        if: ${{ !cancelled() && steps.merge.outcome != 'skipped' }}
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          export GIT_INDEX_FILE="$RUNNER_TEMP/state-index"
+          for f in state.json history.json health.json schedule.json tracker.log; do [ -f "$f" ] && git add -f "$f"; done
+          commit=$(git commit-tree "$(git write-tree)" -m 'Tracker state')
+          git push -q -f origin "$commit:refs/heads/data"
+
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.merge.outcome == 'success'
+        with:
+          path: site
+
+      - id: deploy
+        if: steps.merge.outcome == 'success'
+        uses: actions/deploy-pages@v4
