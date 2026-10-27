@@ -82,6 +82,14 @@ jobs:
           pattern: results-*
           merge-multiple: true
 
+      # Results from the home runner (private repo stock-radar-home) for stores that block GitHub's servers; the merge
+      # uses them only while they are under 8 hours old.
+      - name: Restore home results
+        shell: bash
+        run: |
+          if git fetch -q --depth 1 origin home 2>/dev/null; then git checkout FETCH_HEAD -- results-home.json 2>/dev/null && git reset -q || true; fi
+          ls -l results-home.json 2>/dev/null || echo "No home results."
+
       - name: Merge, alert and build the page
         id: merge
         shell: powershell

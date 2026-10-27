@@ -13,9 +13,11 @@
 #                                                 the last results (e.g. after editing data\catalog.json)
 #   tracker.ps1 -Light -Rotate                    checks the next country after the UAE in turn, only its 100 most
 #                                                 overdue products (the PC's 2-hourly task)
+#   tracker.ps1 -Home -Store noon-ae -All         for a home runner (stock-radar-home): checks stores that block GitHub's
+#                                                 servers, one search at a time, and saves results-home.json for -Merge
 param([string[]]$Store, [string[]]$Product, [switch]$NoAlerts, [switch]$Quiet, [switch]$TestTelegram,
       [int]$Shard = 0, [int]$Shards = 0, [switch]$Merge, [switch]$All, [switch]$Light, [string[]]$Country, [string]$Section,
-      [switch]$PageOnly, [switch]$Rotate)
+      [switch]$PageOnly, [switch]$Rotate, [switch]$Home)
 
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
@@ -27,7 +29,7 @@ $StatePath   = Join-Path $Root 'state.json'
 $HistoryPath = Join-Path $Root 'history.json'
 $HealthPath  = Join-Path $Root 'health.json'
 $LogPath     = Join-Path $Root 'tracker.log'
-$Partial     = [bool]($Store -or $Product) -and $Shards -eq 0 -and -not $Merge
+$Partial     = [bool]($Store -or $Product) -and $Shards -eq 0 -and -not $Merge -and -not $Home
 
 function Write-Log([string]$Message) {
     # A log line is never worth failing a run over (test runs can write at the same moment).
@@ -210,7 +212,7 @@ if (-not $Partial -and $Shards -eq 0 -and -not $Merge) {
 $pool = [runspacefactory]::CreateRunspacePool(1, $(if ($Light) { 6 } else { [Math]::Max(1, [int]$settings.parallelWorkers) }))
 $pool.Open()
 $started = Get-Date
-$perStore = if ($Light) { 1 } else { [Math]::Max(1, [int]$settings.perStoreParallel) }
+$perStore = if ($Light -or $Home) { 1 } else { [Math]::Max(1, [int]$settings.perStoreParallel) }
 $shares = foreach ($s in $stores) {
     $mine = @($due | Where-Object { -not $_.countries -or $s.country -in @($_.countries) })
     # Whole families go to one worker, so its sizes can reuse the family's search.
@@ -230,7 +232,7 @@ $jobs = foreach ($sh in ($shares | Sort-Object Share)) {
     [pscustomobject]@{ Store = $sh.Store; Products = $sh.Products; PS = $ps; Handle = $ps.BeginInvoke() }
 }
 $storeIds = @($jobs | ForEach-Object { $_.Store.id } | Select-Object -Unique)
-$limit = if ($Light) { 1500 } else { [int]$settings.runTimeoutSeconds }
+$limit = if ($Light) { 1500 } elseif ($Home) { 5400 } else { [int]$settings.runTimeoutSeconds }
 # On this PC the time limit counts from the script's start (less any wait for another run), so with its saving step
 # a run ends within the 30 minutes between UAE runs.
 $deadline = if ($Light) { $scriptStart.AddSeconds($limit) + $(if ($lockWait) { $lockWait } else { [TimeSpan]::Zero }) } else { $started.AddSeconds($limit) }
@@ -279,18 +281,32 @@ if ($Shards -gt 0) {
     Write-Host "Shard $Shard of $Shards`: $($storeIds.Count) stores, $($rows.Count) results in $elapsed s."
     return
 }
+# A home runner hands its rows to the cloud's -Merge the same way, through the "home" branch (see check.yml).
+if ($Home) {
+    Save-Json ([ordered]@{ home = $true; at = (Get-Date).ToUniversalTime().ToString('o'); elapsed = $elapsed; storeIds = $storeIds
+                           storeErrors = $storeErrors; rows = @($rows) }) (Join-Path $Root 'results-home.json') 5
+    Write-Host "Home run: $($storeIds.Count) store(s), $($rows.Count) results in $elapsed s."
+    return
+}
 if ($Merge) {
     $files = @(Get-ChildItem (Join-Path $Root 'results-*.json'))
     if (-not $files) { throw 'Nothing to merge: no results-*.json files.' }
-    $dueIds = @()
+    $dueIds = @(); $homeStores = @()
     foreach ($f in $files) {
         $res = Get-Content $f.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+        # Home results count while they are under 8 hours old. Their stores then show as checked instead of
+        # cloud-blocked, and they never change the products' schedule (the cloud machines' due lists do).
+        if ($res.home) {
+            $age = ((Get-Date).ToUniversalTime() - ([datetime]$res.at).ToUniversalTime()).TotalHours
+            if ($age -ge 8) { Write-Log ("Home results are {0:N1} h old: not used." -f $age); continue }
+            $homeStores += @($res.storeIds)
+        } else { $dueIds = @($dueIds + @($res.due) | Select-Object -Unique) }
         foreach ($row in @($res.rows)) { [void]$rows.Add($row) }
         foreach ($prop in @($res.storeErrors.PSObject.Properties)) { $storeErrors[$prop.Name] = $prop.Value }
         $storeIds += @($res.storeIds)
-        $dueIds = @($dueIds + @($res.due) | Select-Object -Unique)
         $elapsed = [Math]::Max($elapsed, [int]$res.elapsed)
     }
+    if ($homeStores) { $cloudBlocked = @($cloudBlocked | Where-Object { $_ -notin $homeStores }); Write-Log "Home results used for: $($homeStores -join ', ')" }
     Write-Log "Merged $($files.Count) result file(s): $($storeIds.Count) stores, $($rows.Count) results."
 }
 
