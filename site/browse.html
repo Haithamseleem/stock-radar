@@ -241,6 +241,8 @@ button.chip.na { color:var(--muted); }
   .menu, .sarrow { min-width:44px; } .btn.star { width:44px; height:44px; } .seg { height:auto; } .chips { gap:8px; }
   .crumbs a, .crumbs button, .brand-h, a.small, .side-foot a { display:inline-flex; align-items:center; min-height:44px; }
 }
+/* Price skyline (radar3d.js) on the comparison page */
+.radar-card { overflow:hidden; } .radar3d.sky { height:300px; }
 </style>
 </head>
 <body>
@@ -307,6 +309,7 @@ button.chip.na { color:var(--muted); }
   </main>
 </div>
 
+<script src="radar3d.js"></script>
 <script>
 'use strict';
 const $ = (id) => document.getElementById(id);
@@ -889,6 +892,22 @@ function renderCompare(v, c) {
   const act = el('div', 'hero-act'); act.append(back, trackBtn(p));
   hero.append(photoEl(p, 'photo big'), mid, act);
   box.append(hero);
+
+  // Price skyline: one pillar per store that has it, as tall as the extra you'd pay over the cheapest (green).
+  if (!p.group && best && window.Radar3D) {
+    const by = {}; list.forEach(r => { if (r.pr != null && (!by[r.s] || eff(r) < eff(by[r.s]))) by[r.s] = r; });
+    const offers = Object.values(by);
+    if (offers.length >= 3) {
+      const sky = el('div', 'card radar-card'); sky.style.marginTop = '14px';
+      const sh = el('div', 'block-h'); sh.append(el('h2', null, 'Price skyline'), el('span', null, 'one pillar per store · height = extra over the cheapest'));
+      const host = el('div', 'radar3d sky'); sky.append(sh, host); box.append(sky);
+      Radar3D(host, { caption: 'Green is the cheapest · tap a store to open its offer' }).setItems(offers.map(r => {
+        const extra = Math.max(0, eff(r) - eff(best)), isBest = r.s === best.s;
+        return { id: r.s, label: stores[r.s].name, logo: stores[r.s].logo, value: extra, highlight: isBest,
+          valueText: isBest ? `Best · ${money(cur, eff(r))}` : `+${money(cur, Math.round(extra))}`, href: linkFor(r, stores[r.s], p), external: true };
+      }));
+    }
+  }
 
   const block = el('div', 'card'); block.style.marginTop = '14px';
   const bh = el('div', 'block-h');

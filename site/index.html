@@ -148,6 +148,10 @@ a.chip { color:var(--text); background:var(--card); border-color:var(--line); } 
 .pstore { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); margin-top:auto; padding-top:12px; } .pstore b { color:var(--text); font-weight:600; }
 .empty { color:var(--muted); background:var(--card); border:1px dashed var(--line); border-radius:var(--radius); padding:22px; text-align:center; grid-column:1 / -1; }
 
+/* Live radar: one pillar per store */
+.radar-card { overflow:hidden; }
+.radar3d { height:clamp(300px, 42vw, 440px); }
+
 /* Top deals */
 .deal-bar { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px 16px; margin-bottom:14px; }
 .expand { display:flex; justify-content:center; margin-top:18px; }
@@ -242,7 +246,7 @@ a.chip { color:var(--text); background:var(--card); border-color:var(--line); } 
   <div class="wrap bar">
     <a class="brand" href="index.html"><img src="brand/mark.svg" alt="" width="32" height="32"><span id="brand">Stock Radar</span></a>
     <nav class="links" aria-label="Page sections">
-      <a href="#instock">In stock now</a><a href="#deals">Top deals</a><a href="#countries">Countries</a><a href="#how">How it works</a><a href="#tracked">Tracker</a><a href="deals.html">All deals</a>
+      <a href="#instock">In stock now</a><a href="#radar">Live radar</a><a href="#deals">Top deals</a><a href="#countries">Countries</a><a href="#how">How it works</a><a href="#tracked">Tracker</a><a href="deals.html">All deals</a>
     </nav>
     <div class="end">
       <button class="btn dark" id="refreshBtn" type="button" hidden aria-label="Refresh results for this country"><span aria-hidden="true">⟳</span><span class="lbl" id="refreshLbl">Refresh</span></button>
@@ -286,6 +290,10 @@ a.chip { color:var(--text); background:var(--card); border-color:var(--line); } 
 
 <main class="wrap">
   <div class="kpis" id="kpis"></div>
+  <section class="block" id="radar">
+    <div class="head"><div><span class="eyebrow">Live radar</span><h2>Who has stock right now</h2><p id="radarLead"></p></div></div>
+    <div class="card radar-card"><div class="radar3d" id="radar3d"></div></div>
+  </section>
 
   <section class="block" id="countries">
     <div class="head"><div><span class="eyebrow">Your country</span><h2>Pick where you shop</h2><p>Prices, stock and stores change with the country. Your choice is remembered on the browse page too.</p></div></div>
@@ -377,6 +385,7 @@ a.chip { color:var(--text); background:var(--card); border-color:var(--line); } 
   </div>
 </footer>
 
+<script src="radar3d.js"></script>
 <script>
 'use strict';
 const $ = (id) => document.getElementById(id);
@@ -408,6 +417,7 @@ const watched = () => { const v = readList('radarWatch', []); return Array.isArr
 const saveList = (key, v) => { try { localStorage.setItem(key, JSON.stringify(v)); } catch { } };
 let seenAtLoad = null;
 let deals = [], dealSec = '', dealSort = 'pct', dealsOpen = false;
+let radar = null;
 // The UAE is checked every 30 minutes; the other countries one after another, a few hours apart.
 const howOften = (k) => k === 'AE' || !D.rotateHours ? `every ${D.intervalMinutes} minutes` : `about every ${Math.max(1, D.countries.length - 1) * D.rotateHours} hours`;
 function photoEl(p, cls) {
@@ -506,6 +516,17 @@ function render() {
     i.innerHTML = icon; i.style.background = bg; i.style.color = fg;
     t.append(el('b', null, n.toLocaleString('en-US')), el('span', null, label)); k.append(i, t); return k;
   }));
+
+  // Live radar: one pillar per store here, as tall as the number of products it has in stock; the most stocked is green.
+  const per = {}; here.forEach(r => { if (r.st === 'InStock') (per[r.s] = per[r.s] || new Set()).add(r.p); });
+  const radarItems = D.stores.filter(s => s.country === code).map(s => {
+    const n = per[s.id] ? per[s.id].size : 0;
+    return { id: s.id, label: s.name, logo: s.logo, value: n, valueText: `${n.toLocaleString('en-US')} in stock`, href: browse({ store: s.id }) };
+  });
+  const mostStocked = radarItems.reduce((a, b) => (!a || b.value > a.value ? b : a), null); if (mostStocked && mostStocked.value) mostStocked.highlight = true;
+  if (!radar && window.Radar3D) radar = Radar3D($('radar3d'), { caption: 'Drag to turn · tap a store to browse it' });
+  if (radar) radar.setItems(radarItems);
+  $('radarLead').textContent = `Each pillar is a store in ${c.name}, as tall as the number of products it has in stock right now. Green has the most.`;
 
   // Country picker: one chip per country, the chosen one pressed.
   $('picker').replaceChildren(...D.countries.slice().sort((a, b) => a.name.localeCompare(b.name)).map(k => {
