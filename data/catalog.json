@@ -599,6 +599,10 @@
     { "section": "Smart home", "brand": "eufy", "name": "eufy security cameras", "query": "eufy security camera", "match": ["eufy", "camera|cam"], "group": true, "ex": "smart", "minUsd": 40 },
     { "section": "Smart home", "brand": "TP-Link", "name": "TP-Link Tapo cameras", "query": "tapo camera", "match": ["tapo", "camera|cam"], "group": true, "ex": "smart", "minUsd": 25 },
     { "section": "Smart home", "brand": "Philips", "name": "Philips Hue lights", "query": "philips hue starter kit", "match": ["philips hue"], "group": true, "ex": "smart", "minUsd": 50 },
+    { "section": "Smart home", "brand": "Philips", "name": "Philips Hue Play light bars (all models)", "query": "philips hue play light bar", "match": ["hue", "play light bar|play lightbar"], "not": ["mount", "bracket", "replacement"], "ex": "smart", "minUsd": 40, "group": true, "type": "Lights & locks" },
+    { "section": "Smart home", "brand": "Govee", "name": "Govee TV and gaming light bars (all models)", "query": "govee light bar", "match": ["govee", "light bar|lightbar|light bars|flow pro|flow plus"], "not": ["mount", "bracket", "replacement"], "ex": "smart", "minUsd": 20, "group": true, "type": "Lights & locks" },
+    { "section": "Smart home", "brand": "Philips", "name": "Philips Hue Lightstrips (all models)", "query": "philips hue lightstrip", "match": ["hue", "lightstrip|light strip|gradient strip"], "not": ["extension", "replacement"], "ex": "smart", "minUsd": 40, "group": true, "type": "Lights & locks" },
+    { "section": "Smart home", "brand": "Govee", "name": "Govee LED strip lights (all models)", "query": "govee led strip lights", "match": ["govee", "strip|rope light"], "not": ["extension", "replacement"], "ex": "smart", "minUsd": 10, "group": true, "type": "Lights & locks" },
     { "section": "Smart home", "brand": "Any brand", "name": "Smart door locks", "query": "smart door lock", "match": ["smart lock|smart door lock"], "group": true, "ex": "smart", "minUsd": 60 },
 
     { "section": "Big appliances", "brand": "Whirlpool", "name": "Whirlpool dishwashers", "match": ["whirlpool", "dishwasher"], "group": true, "ex": "appliance", "minUsd": 200 },
@@ -721,6 +725,10 @@
     { "section": "TVs", "brand": "Hisense", "name": "Hisense UHD TVs", "query": "hisense uhd tv", "match": ["hisense", "uhd", "tv"], "not": ["mini led", "qled"], "type": "LED & smart TVs", "group": true, "ex": "tv", "minUsd": 150 },
     { "section": "TVs", "brand": "TCL", "name": "TCL UHD TVs", "query": "tcl uhd tv", "match": ["tcl", "uhd", "tv"], "not": ["mini led", "qled"], "type": "LED & smart TVs", "group": true, "ex": "tv", "minUsd": 150 },
     { "section": "Accessories", "brand": "Apple", "name": "Apple AirTag", "query": "apple airtag", "match": ["airtag"], "not": ["holder", "keychain", "key ring", "loop"], "ex": "pcacc", "minUsd": 25 },
-    { "section": "Accessories", "brand": "Samsung", "name": "Galaxy SmartTag2", "query": "samsung galaxy smarttag2", "match": ["smarttag2|smarttag 2"], "ex": "pcacc", "minUsd": 20 }
+    { "section": "Accessories", "brand": "Samsung", "name": "Galaxy SmartTag2", "query": "samsung galaxy smarttag2", "match": ["smarttag2|smarttag 2"], "ex": "pcacc", "minUsd": 20 },
+    { "section": "Accessories", "brand": "BenQ", "name": "BenQ ScreenBar monitor lights (all models)", "query": "benq screenbar", "match": ["benq", "screenbar|screen bar"], "not": ["replacement"], "minUsd": 60, "group": true, "type": "Monitor light bars" },
+    { "section": "Accessories", "brand": "Xiaomi", "name": "Xiaomi monitor light bars (all models)", "query": "xiaomi monitor light bar", "match": ["xiaomi|mi", "monitor light|monitor lightbar|computer monitor light"], "minUsd": 20, "group": true, "type": "Monitor light bars" },
+    { "section": "Accessories", "brand": "Baseus", "name": "Baseus monitor light bars (all models)", "query": "baseus monitor light bar", "match": ["baseus", "monitor light|screen light|screen hanging light"], "minUsd": 12, "group": true, "type": "Monitor light bars" },
+    { "section": "Accessories", "brand": "All brands", "name": "Car LED light bars (all brands)", "query": "car led light bar", "match": ["led", "light bar|lightbar", "car|off road|offroad|truck|4x4|jeep|suv|pickup|vehicle"], "not": ["bicycle"], "minUsd": 15, "group": true, "type": "Car LED light bars" }
   ]
 }
