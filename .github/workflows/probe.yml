@@ -1,0 +1,31 @@
+# Manual diagnosis of failing stores from GitHub's servers (probe-cloud.ps1). It never runs on a schedule and saves
+# nothing; the findings are in the run's log.
+name: Probe stores
+
+on:
+  workflow_dispatch:
+    inputs:
+      stores:
+        description: Store ids, separated by commas
+        type: string
+        required: true
+      query:
+        description: Search words
+        type: string
+        default: iphone 17 pro max
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe
+        shell: powershell
+        env:
+          PROBE_STORES: ${{ inputs.stores }}
+          PROBE_QUERY: ${{ inputs.query }}
+        run: ./probe-cloud.ps1
