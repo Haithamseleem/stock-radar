@@ -24,7 +24,9 @@ function Resolve-Rows($Store, $Product, $Listings, $Country) {
     }
 
     if ($Product.group) {
-        $ok = @($matched | Where-Object { $_.InStock -ne $false -and -not $_.PreOrder } | Sort-Object $byPrice | Select-Object -First 12)
+        # The cheapest models only: 12 per store, or the store's "maxModels" (Amazon lists far more models and sellers).
+        $max = if ($Store.maxModels) { [int]$Store.maxModels } else { 12 }
+        $ok = @($matched | Where-Object { $_.InStock -ne $false -and -not $_.PreOrder } | Sort-Object $byPrice | Select-Object -First $max)
         if (-not $ok) { & $row "$($Store.id)|$($Product.id)|" '' 'NotFound' $null '' 0; return }
         foreach ($l in $ok) {
             $st = if ($l.InStock -eq $true -and -not $Store.weak) { 'InStock' } else { 'Unverified' }

@@ -3,14 +3,14 @@
 # Amazon sometimes answers with a short "bm-verify" bot-check page (more often after several quick requests);
 # the checker waits and retries once or twice (alternating curl / Invoke-WebRequest), then throws.
 # Store fields: host (e.g. amazon.ae).
-function Get-AmazonSearchPage($Store, [string]$Query) {
-    $url = "https://www.$($Store.host)/s?k=$Query"
-    for ($try = 1; $try -le 3; $try++) {
+function Get-AmazonSearchPage($Store, [string]$Query, [int]$Page = 1, [int]$Tries = 3) {
+    $url = "https://www.$($Store.host)/s?k=$Query$(if ($Page -gt 1) { "&page=$Page" })"
+    for ($try = 1; $try -le $Tries; $try++) {
         $html = $null
         try { $html = if ($try % 2 -eq 1) { Get-Curl $url -Cookies } else { Get-Web $url } } catch { $html = $null }
         if ($html -and $html -match 'data-component-type="s-search-result"') { return $html }
         if ($html -and $html -match 'did not match any products|No results for') { return $html }
-        if ($try -lt 3) { Start-Sleep -Seconds (4 * $try) }
+        if ($try -lt $Tries) { Start-Sleep -Seconds (4 * $try) }
     }
     throw 'Amazon returned a bot-check page instead of search results'
 }
@@ -34,9 +34,17 @@ function Get-AmazonCoupon([string]$Card) {
 
 function Find-amazon($Store, $Product) {
     $q = [uri]::EscapeDataString((Get-ProductQuery $Store $Product))
-    $html = Get-AmazonSearchPage $Store $q
-    $cards = [regex]::Split($html, '(?=<div[^>]*data-component-type="s-search-result")') |
-        Where-Object { $_ -match '^<div[^>]*data-component-type="s-search-result"' }
+    $pages = @(Get-AmazonSearchPage $Store $q)
+    # Model lists ("all models") also read the second results page, so more models and prices come in. A page 2 that
+    # gets a bot check is skipped (two tries only), so it never costs the product its page 1 results.
+    if ($Product.group -and $pages[0] -match 'data-component-type="s-search-result"') {
+        Start-Sleep -Milliseconds 1500
+        try { $pages += Get-AmazonSearchPage $Store $q 2 2 } catch { }
+    }
+    $cards = foreach ($html in $pages) {
+        [regex]::Split($html, '(?=<div[^>]*data-component-type="s-search-result")') |
+            Where-Object { $_ -match '^<div[^>]*data-component-type="s-search-result"' }
+    }
     $seen = @{}
     foreach ($c in $cards) {
         $asin = [regex]::Match($c, 'data-asin="([A-Z0-9]{10})"').Groups[1].Value
