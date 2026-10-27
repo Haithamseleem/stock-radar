@@ -632,10 +632,10 @@ function renderCards(rows, v, c) {
   const byFam = {};
   rows.forEach(r => { const f = famOf(products[r.p]); (byFam[f] = byFam[f] || []).push(r); });
   if (v.product && products[v.product] && !byFam[famOf(products[v.product])]) byFam[famOf(products[v.product])] = [];
-  // In a section, products no store here lists (yet) get a card too, with links to search each store, so the whole
-  // catalog can be browsed; filters that need an offer leave them out.
-  if (sectionName && !v.instock && !v.store && !v.pmin && !v.pmax && !v.coupon && !v.confirmed) {
-    DATA.products.filter(p => p.category === sectionName && (!typeName || p.type === typeName) && (!brandName || p.brand === brandName)
+  // In a section, or for a search, products no store here lists (yet) get a card too, with links to search each store,
+  // so the whole catalog can be browsed and found; filters that need an offer leave them out.
+  if ((sectionName || v.q) && !v.instock && !v.store && !v.pmin && !v.pmax && !v.coupon && !v.confirmed) {
+    DATA.products.filter(p => (!sectionName || p.category === sectionName) && (!typeName || p.type === typeName) && (!brandName || p.brand === brandName)
       && (!v.product || p.id === v.product) && (!v.q || searchHit(v.q, p.name, p.name)))
       .forEach(p => { const f = famOf(p); if (!byFam[f]) byFam[f] = []; });
   }
