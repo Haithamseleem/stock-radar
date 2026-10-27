@@ -444,6 +444,15 @@ function productCard(p, href, label, labelCls, price, sub, store, note, extra) {
 // Chip groups are rebuilt on each press; keyboard focus goes back to the same chip.
 const keepFocus = async (box, fn) => { const i = [...box.children].indexOf(document.activeElement); await fn(); if (i >= 0 && box.children[i]) box.children[i].focus({ preventScroll: true }); };
 const onePerFamily = (list, key) => { const seen = new Set(); return list.filter(x => { const f = key(x).family || key(x).id; return !seen.has(f) && seen.add(f); }); };
+// A pasted store title finds the product whose whole name is in it (the longest name wins, so "Flex II" beats "Flex");
+// otherwise every word typed must start a word of the product's name.
+const nameWords = (t) => String(t || '').toLowerCase().replace(/\+/g, ' plus ').replace(/[^\p{L}\p{N}]+/gu, ' ').trim().split(' ').filter(Boolean);
+function findProduct(q) {
+  const qw = nameWords(q); if (!qw.length) return null;
+  const qs = ' ' + qw.join(' ') + ' '; let best = null, n = 0;
+  D.products.forEach(p => { const w = nameWords(p.name); if (w.length > n && w.every(x => qs.includes(' ' + x + ' '))) { best = p; n = w.length; } });
+  return best || D.products.find(p => { const s = ' ' + nameWords(p.name).join(' '); return qw.every(x => s.includes(' ' + x)); }) || null;
+}
 
 function render() {
   const c = countries[code] || { name: code, currency: '' }, cur = c.currency;
@@ -679,7 +688,7 @@ loadScript('data.js', () => window.RADAR_DATA).then(async data => {
   $('finder').addEventListener('submit', (e) => {
     e.preventDefault();
     const q = $('q').value.trim().toLowerCase();
-    const hit = D.products.find(p => p.name.toLowerCase() === q) || D.products.find(p => q && p.name.toLowerCase().includes(q));
+    const hit = D.products.find(p => p.name.toLowerCase() === q) || findProduct(q);
     location.href = hit ? browse({ compare: hit.id }) : browse(q ? { q } : {});
   });
   $('lead').textContent = `Phones, laptops, gaming, TVs and home appliances: Stock Radar checks ${plural(D.stores.length, 'store')} in ${D.countries.length} countries around the clock, so you see who has it in stock and who sells it cheapest.`;

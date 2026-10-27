@@ -497,6 +497,18 @@ function openCompare(id) { compareId = id; viewMode = 'browse'; pushNext = true;
 function go(section, mode, brand, type) { compareId = ''; sectionName = section; brandName = section ? (brand || '') : ''; typeName = section ? (type || '') : ''; viewMode = mode || 'browse'; pushNext = true; closeMenu(); render(); window.scrollTo({ top: 0, behavior: motion }); }
 const closeMenu = () => { $('side').classList.remove('open'); $('menuBtn').setAttribute('aria-expanded', 'false'); };
 
+// Search by words in any order. Every word typed must start a word in the store, product or listing text, or the
+// product's whole name must be inside what was typed, so a pasted store title
+// ("Bose SoundLink Flex II Portable Bluetooth Speaker") still finds the product.
+const searchWords = (t) => String(t || '').toLowerCase().replace(/\+/g, ' plus ').replace(/[^\p{L}\p{N}]+/gu, ' ').trim().split(' ').filter(Boolean);
+function searchHit(q, text, name) {
+  const qw = searchWords(q); if (!qw.length) return true;
+  const hay = ' ' + searchWords(text).join(' ');
+  if (qw.every(w => hay.includes(' ' + w))) return true;
+  const nw = searchWords(name), qs = ' ' + qw.join(' ') + ' ';
+  return nw.length > 1 && nw.every(w => qs.includes(' ' + w + ' '));
+}
+
 // ---- main render ----
 function render() {
   const v = view(); writeHash(v);
@@ -513,7 +525,7 @@ function render() {
     const lo = parseFloat(v.pmin) || 0, hi = parseFloat(v.pmax) || Infinity;
     if (v.pmin || v.pmax) rows = rows.filter(r => AVAIL(r) && r.pr != null && eff(r) >= lo && eff(r) <= hi);
   }
-  if (v.q && !comparing) rows = rows.filter(r => (stores[r.s].name + ' ' + products[r.p].name + ' ' + (r.t || '')).toLowerCase().includes(v.q));
+  if (v.q && !comparing) rows = rows.filter(r => searchHit(v.q, stores[r.s].name + ' ' + products[r.p].name + ' ' + (r.t || ''), products[r.p].name));
 
   $('results').hidden = comparing || discounting; $('compare').hidden = !comparing; $('discounts').hidden = !discounting;
   $('toolbar').hidden = comparing; $('sideCols').hidden = comparing;
@@ -624,7 +636,7 @@ function renderCards(rows, v, c) {
   // catalog can be browsed; filters that need an offer leave them out.
   if (sectionName && !v.instock && !v.store && !v.pmin && !v.pmax && !v.coupon && !v.confirmed) {
     DATA.products.filter(p => p.category === sectionName && (!typeName || p.type === typeName) && (!brandName || p.brand === brandName)
-      && (!v.product || p.id === v.product) && (!v.q || p.name.toLowerCase().includes(v.q)))
+      && (!v.product || p.id === v.product) && (!v.q || searchHit(v.q, p.name, p.name)))
       .forEach(p => { const f = famOf(p); if (!byFam[f]) byFam[f] = []; });
   }
   const cards = Object.keys(byFam).map(f => ({ fam: f, members: families[f] || [], rows: byFam[f] }))
