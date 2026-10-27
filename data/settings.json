@@ -65,7 +65,8 @@
         { "name": "Trackers", "words": ["airtag", "smarttag"] },
         { "name": "Printers", "words": ["printer", "ecotank", "pixma"] },
         { "name": "Monitor light bars", "words": ["screenbar", "monitor light"] },
-        { "name": "Car LED light bars", "words": ["car led light bar"] } ] },
+        { "name": "Car LED light bars", "words": ["car led light bar", "car interior led"] },
+        { "name": "Streaming lights", "words": ["litra", "key light"] } ] },
     { "name": "Smart home", "every": 16, "icon": "🏠", "blurb": "Wi-Fi mesh, smart speakers, cameras and lights", "types": [
         { "name": "Wi-Fi & routers", "words": ["deco", "zenwifi", "router", "rapture", "mesh"] },
         { "name": "Smart speakers & displays", "words": ["echo", "homepod", "nest hub"] },
