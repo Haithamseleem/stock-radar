@@ -510,7 +510,7 @@ function render() {
     $('pvCta').textContent = l.length > 4 ? `Compare all ${l.length} stores →` : 'Open the comparison →';
   }
 
-  $('kpis').replaceChildren(...[[ICONS.store, 'var(--primary-soft)', 'var(--primary)', D.stores.length, 'stores checked'], [ICONS.globe, 'var(--tag-bg)', 'var(--tag)', D.countries.length, 'countries'],
+  $('kpis').replaceChildren(...[[ICONS.store, 'var(--primary-soft)', 'var(--primary)', D.stores.filter(s => !s.cloudBlocked).length, 'stores checked'], [ICONS.globe, 'var(--tag-bg)', 'var(--tag)', D.countries.length, 'countries'],
     [ICONS.box, 'var(--warn-bg)', 'var(--warn)', D.products.length, 'products tracked'], [ICONS.check, 'var(--ok-bg)', 'var(--ok)', inStock.size, `in stock now in ${c.name}`]].map(([icon, bg, fg, n, label]) => {
     const k = el('div', 'card kpi'), i = el('span', 'ki'), t = el('div');
     i.innerHTML = icon; i.style.background = bg; i.style.color = fg;
@@ -521,7 +521,9 @@ function render() {
   const per = {}; here.forEach(r => { if (r.st === 'InStock') (per[r.s] = per[r.s] || new Set()).add(r.p); });
   const radarItems = D.stores.filter(s => s.country === code).map(s => {
     const n = per[s.id] ? per[s.id].size : 0;
-    return { id: s.id, label: s.name, logo: s.logo, value: n, valueText: `${n.toLocaleString('en-US')} in stock`, href: browse({ store: s.id }) };
+    // A store that blocks GitHub's servers has no live count: say so instead of "0 in stock".
+    return { id: s.id, label: s.name, logo: s.logo, value: n, valueText: s.cloudBlocked ? "can't check from the cloud" : `${n.toLocaleString('en-US')} in stock`,
+             href: s.cloudBlocked ? s.url : browse({ store: s.id }), external: !!s.cloudBlocked };
   });
   const mostStocked = radarItems.reduce((a, b) => (!a || b.value > a.value ? b : a), null); if (mostStocked && mostStocked.value) mostStocked.highlight = true;
   if (!radar && window.Radar3D) radar = Radar3D($('radar3d'), { caption: 'Drag to turn · tap a store to browse it' });
@@ -712,7 +714,7 @@ loadScript('data.js', () => window.RADAR_DATA).then(async data => {
     const hit = D.products.find(p => p.name.toLowerCase() === q) || findProduct(q);
     location.href = hit ? browse({ compare: hit.id }) : browse(q ? { q } : {});
   });
-  $('lead').textContent = `Phones, laptops, gaming, TVs and home appliances: Stock Radar checks ${plural(D.stores.length, 'store')} in ${D.countries.length} countries around the clock, so you see who has it in stock and who sells it cheapest.`;
+  $('lead').textContent = `Phones, laptops, gaming, TVs and home appliances: Stock Radar checks ${plural(D.stores.filter(s => !s.cloudBlocked).length, 'store')} in ${D.countries.length} countries around the clock, so you see who has it in stock and who sells it cheapest.`;
   $('howCheck').textContent = `Every store is searched automatically, about every ${D.intervalMinutes} minutes in the UAE and in turn for the other countries, day and night.`;
   await setCountry(code);
 }).catch(() => { $('lead').textContent = 'Results are not available yet. Try again in a few minutes.'; });

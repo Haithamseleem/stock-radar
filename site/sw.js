@@ -2,7 +2,7 @@
 // Results (data*.js) and pages come from the network first, so prices and new versions show at once, falling back to
 // the last copy when offline; icons, logos and photos come from the cache first and are refreshed in the background.
 // Bump when the pages change a lot, so installed apps drop the old copies at once.
-const CACHE = 'stock-radar-v12';
+const CACHE = 'stock-radar-v13';
 const SHELL = ['./', './index.html', './browse.html', './deals.html', './radar3d.js', './manifest.webmanifest', './favicon.svg', './icon-192.png', './brand/mark.svg'];
 
 self.addEventListener('install', (e) => {

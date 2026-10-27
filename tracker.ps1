@@ -117,6 +117,12 @@ if ($Rotate) {
     $Country = @($order[([array]::IndexOf($order, $last) + 1) % $order.Count])
 }
 if ($Country) { $stores = @($stores | Where-Object { $_.country -in $Country }) }
+# settings.json "cloudBlockedStores": stores that refuse GitHub's servers (checked with probe.yml on 27 Oct: Cloudflare or
+# Akamai challenge pages, empty pages, or no answer). The cloud doesn't ask them at all; the page lists them as "can't
+# be checked from the cloud" and drops their old prices instead of showing them as current.
+$cloudBlocked = @($settings.cloudBlockedStores | Where-Object { $_ })
+$cloudRun = $Shards -gt 0 -or $Merge
+if ($cloudRun) { $stores = @($stores | Where-Object { $_.id -notin $cloudBlocked }) }
 if ($Shards -gt 0) {
     # Sorted by id, so the stores of one slow platform (e.g. six Lulu sites) land on different machines.
     $sorted = @($stores | Sort-Object id)
@@ -209,6 +215,9 @@ $shares = foreach ($s in $stores) {
     $mine = @($due | Where-Object { -not $_.countries -or $s.country -in @($_.countries) })
     # Whole families go to one worker, so its sizes can reuse the family's search.
     $fams = @($mine | Group-Object { if ($_.family) { $_.family } else { $_.id } })
+    # Each run starts the list at a different point, so a slow store (Amazon) that runs out of time doesn't always miss
+    # the same products at the end of the catalog (on 27 Oct: the Accessories light bars).
+    if ($fams.Count -gt 1) { $off = $slot % $fams.Count; if ($off) { $fams = @($fams[$off..($fams.Count - 1)]) + @($fams[0..($off - 1)]) } }
     $n = [Math]::Min($perStore, $fams.Count)
     for ($k = 0; $k -lt $n; $k++) { [pscustomobject]@{ Store = $s; Share = $k; Products = @(for ($i = $k; $i -lt $fams.Count; $i += $n) { $fams[$i].Group }) } }
 }
@@ -353,6 +362,7 @@ foreach ($k in @($previous.Keys)) {
         if ($dueSet[$parts[1]] -and $runStores[$parts[0]]) { $state[$k].stale = $true }
     }
 }
+if ($cloudRun -and $cloudBlocked) { foreach ($k in @($state.Keys)) { if ($k.Split('|')[0] -in $cloudBlocked) { $state.Remove($k) } } }
 Save-Json $state $StatePath
 if ($Rotate) { Save-Json ([ordered]@{ last = $Country[0]; at = $now }) $RotationPath }
 # A product counts as checked unless every store that tried it failed, so a run that timed out leaves those due
@@ -374,6 +384,8 @@ foreach ($id in $storeIds) {
         $health[$id].fails++; $health[$id].error = $storeErrors[$id]
     } else { $health.Remove($id) }
 }
+# A cloud-blocked store isn't failing: it isn't asked.
+if ($cloudRun) { foreach ($id in $cloudBlocked) { $health.Remove($id) } }
 Save-Json $health $HealthPath
 
 # Telegram: each country's channel (countries.json "telegram") plus the optional all-countries channel (settings.globalChannel).
@@ -453,7 +465,8 @@ $data = [ordered]@{
     countries       = @($countries | Where-Object { $storeCountry.Values -contains $_.code } | ForEach-Object {
                         [ordered]@{ code = $_.code; name = $_.name; currency = $_.currency; usdRate = $_.usdRate; cities = @($_.cities); telegram = $_.telegram } })
     stores          = @($allStores | ForEach-Object { [ordered]@{ id = $_.id; name = $_.name; adapter = $_.adapter; country = $_.country; url = $_.url; search = (Get-SearchLink $_)
-                                                           logo = $logoFor[$_.adapter]; cities = @($_.cities | Where-Object { $_ }); weak = [bool]$_.weak } })
+                                                           logo = $logoFor[$_.adapter]; cities = @($_.cities | Where-Object { $_ }); weak = [bool]$_.weak
+                                                           cloudBlocked = [bool]($cloudRun -and $_.id -in $cloudBlocked) } })
     products        = @($products | ForEach-Object { [ordered]@{ id = $_.id; name = $_.name; brand = $_.brand; category = $_.category; type = $_.type; family = $_.family
                                                                familyName = $_.familyName; size = $_.size; group = [bool]$_.group; hot = [bool]$_.hot; every = $_.every; query = $_.query; queries = $_.queries; photo = (& $photo $_) } })
     sections        = @($settings.sections)

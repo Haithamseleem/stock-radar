@@ -243,6 +243,9 @@ button.chip.na { color:var(--muted); }
 }
 /* Price skyline (radar3d.js) on the comparison page */
 .radar-card { overflow:hidden; } .radar3d.sky { height:300px; }
+/* Empty cards: where it is in stock in other countries */
+.elsewhere { font-size:13px; color:var(--muted); margin-top:6px; line-height:1.5; }
+.elsewhere a { font-weight:600; }
 </style>
 </head>
 <body>
@@ -474,6 +477,31 @@ function bestPrice(list) {
 }
 // What the best offer saves against the priciest other store (prices after coupons), as "Save AED 350 (5%)", the
 // percent of the higher price. Under 1% isn't worth showing; over half is nearly always a different item.
+// Where a product with nothing here is in stock in other countries: the cheapest offer per country (data.js "best"),
+// cheapest first by the rough USD rate, as links that open that country's comparison.
+function elsewhereEl(ids, v, cur) {
+  const here = countries[v.country], per = {};
+  (DATA.best || []).forEach(b => {
+    if (!ids.includes(b.p) || b.c === v.country || !countries[b.c] || !stores[b.s]) return;
+    const k = countries[b.c], usd = k.usdRate ? b.pr / k.usdRate : null;
+    if (!per[b.c] || (usd != null && (per[b.c].usd == null || usd < per[b.c].usd))) per[b.c] = { b, usd };
+  });
+  const top = Object.values(per).sort((a, b) => (a.usd ?? 1e15) - (b.usd ?? 1e15)).slice(0, 3);
+  if (!top.length) return null;
+  const box = el('div', 'elsewhere'); box.append('In stock elsewhere: ');
+  top.forEach(({ b, usd }, i) => {
+    const k = countries[b.c];
+    const approx = usd != null && here && here.usdRate && k.currency !== cur ? ` (≈ ${money(cur, Math.round(usd * here.usdRate))})` : '';
+    const a = el('a', null, `${k.name} from ${money(k.currency, b.pr)}${approx}`);
+    a.href = 'browse.html#' + new URLSearchParams({ country: b.c, compare: b.p }).toString();
+    // A full reload, so the page loads that country's results.
+    a.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); location.hash = a.hash.slice(1); location.reload(); });
+    if (i) box.append(' · ');
+    box.append(a);
+  });
+  return box;
+}
+
 function savingOf(best, list) {
   if (!best || best.pr == null) return null;
   const hi = list.filter(r => r.pr != null && r.s !== best.s).sort((a, b) => eff(b) - eff(a))[0];
@@ -541,7 +569,7 @@ function render() {
     chip('ok', `${fams.size} product${fams.size === 1 ? '' : 's'} in stock`);
     const unconf = new Set(avail.filter(r => r.st === 'Unverified').map(r => famOf(products[r.p]))).size; if (unconf) chip('warn', `${unconf} unconfirmed`);
     const cps = avail.filter(r => r.cp).length; if (cps) chip('tag', `${cps} with a coupon`);
-    chip('', `${DATA.stores.filter(s => s.country === v.country).length} stores checked in ${c ? c.name : ''}`);
+    chip('', `${DATA.stores.filter(s => s.country === v.country && !s.cloudBlocked).length} stores checked in ${c ? c.name : ''}`);
   }
   const m = /^@(\w+)$/.exec((c && c.telegram) || DATA.globalChannel || '');
   $('tg').hidden = !m; if (m) $('tg').href = 'https://t.me/' + m[1];
@@ -701,6 +729,7 @@ function familyRow(x, c, v) {
   const pr = el('div', 'lprice'), best = p.group ? avail[0] : bestPrice(avail);
   if (best) pr.append(el('b', null, (p.group ? 'from ' : '') + money(cur, eff(best))), el('div', 'small', p.group ? `${avail.length} models` : `at ${stores[best.s].name}`));
   else pr.append(el('span', 'small', x.rows.length ? 'Not in stock right now' : 'Not listed here yet'));
+  if (!best) { const ew = elsewhereEl(p.group ? x.members.map(q => q.id) : [p.id], v, cur); if (ew) pr.append(ew); }
   const sv = p.group ? null : savingOf(best, avail); if (sv) pr.append(saveEl(sv, cur));
   const n = new Set(avail.map(r => r.s)).size;
   const act = el('div', 'lact'), btn = el('button', 'btn ghost small', avail.length ? (p.group ? 'See models' : 'Compare') : 'Search');
@@ -733,6 +762,7 @@ function familyCard(x, c, v) {
     if (avail.length) line.append(el('b', null, `${avail.length} model${avail.length > 1 ? 's' : ''} available`), document.createTextNode(` at ${n} store${n > 1 ? 's' : ''} · from ${money(cur, eff(avail[0]))}`));
     else line.textContent = 'No models available right now';
     card.append(line);
+    if (!avail.length) { const ew = elsewhereEl(x.members.map(q => q.id), v, cur); if (ew) card.append(ew); }
     avail.slice(0, viewStyle === 'big' ? 5 : 3).forEach(r => card.append(modelRow(r, p, cur)));
   } else {
     const best = bestPrice(avail), n = new Set(avail.filter(r => r.st === 'InStock').map(r => r.s)).size;
@@ -740,6 +770,7 @@ function familyCard(x, c, v) {
     else line.textContent = x.rows.length ? 'Not in stock anywhere right now' : 'Not listed at the stores here yet';
     const sv = savingOf(best, avail); if (sv) { line.append(' '); line.append(saveEl(sv, cur, 'chip')); }
     card.append(line);
+    if (!best) { const ew = elsewhereEl([p.id], v, cur); if (ew) card.append(ew); }
     avail.slice(0, viewStyle === 'big' ? 6 : 4).forEach(r => {
       const row = el('div', 'offer'), s = stores[r.s];
       const left = el('div'); left.append(storeName(s, r.c ? 'Pick-up: ' + r.c : ''));
@@ -964,7 +995,7 @@ function renderCompare(v, c) {
   }
 
   // The same product elsewhere: cheapest confirmed offer per country, roughly converted into this country's currency.
-  if (!p.group && c) {
+  if (c) {
     const others = (DATA.best || []).filter(b => b.p === p.id && b.c !== v.country && countries[b.c] && stores[b.s])
       .map(b => Object.assign({ conv: countries[b.c].usdRate && c.usdRate ? b.pr / countries[b.c].usdRate * c.usdRate : null }, b))
       .sort((a, b) => (a.conv ?? 1e15) - (b.conv ?? 1e15));
@@ -1087,7 +1118,8 @@ function renderSide(v) {
     const nm = storeName(s, s.cities && s.cities.length ? s.cities.join(', ') : 'delivers nationwide');
     li.append(href ? Object.assign(extLink(href, ''), { style: 'color:inherit' }) : el('span'));
     li.firstChild.append(nm);
-    if (failing.has(s.id)) li.append(el('span', 'small', " · couldn't be checked recently"));
+    if (s.cloudBlocked) li.append(el('span', 'small', " · can't be checked from the cloud (it blocks GitHub's servers): open it to check"));
+    else if (failing.has(s.id)) li.append(el('span', 'small', " · couldn't be checked recently"));
     sl.append(li);
   });
 }
